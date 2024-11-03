@@ -26,6 +26,6 @@ public class DiceModel
     public void SetValue(int value)
     {
         this.value = value;
-        OnDiceValueChange.Invoke(value);
+        OnDiceValueChange?.Invoke(value);
     }
 }

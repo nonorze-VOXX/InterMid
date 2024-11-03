@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine.Events;
 
 [Serializable]
 public class PlayerMachine
@@ -12,6 +13,8 @@ public class PlayerMachine
     private List<DiceController> _dices = new();
 
     private IPlayerState _state;
+
+    private UnityAction<string> OnStateChange;
 
 
     public PlayerMachine(Player player)
@@ -29,7 +32,14 @@ public class PlayerMachine
             if (value == null) throw new ArgumentNullException(nameof(value));
             _state?.OnExit();
             _state = value;
+            OnStateChange?.Invoke("Player State: " + _state.GetType().Name);
+            _state.OnEnter();
         }
+    }
+
+    public void AddListener(UnityAction<string> action)
+    {
+        OnStateChange += action;
     }
 
 
@@ -37,21 +47,26 @@ public class PlayerMachine
     {
         var diceViews = _player.GetDiceView();
         for (var i = 0; i < 3; i++) _dices.Add(new DiceController(diceViews[i]));
-        _state = new ThrowDiceState(this, _dices);
+        State = new ThrowDiceState(this, _dices);
     }
 
     public void Update()
     {
-        _state.Update();
+        State.Update();
     }
 
     public void ToMergeState()
     {
-        _state = new DiceMergeState(this);
+        State = new DiceMergeState(this);
     }
 
     public void ToBattleState()
     {
-        _state = new PlayerBattleState(this, _player.Atk);
+        State = new PlayerBattleState(this, _player.Atk);
+    }
+
+    public void Prepared()
+    {
+        _player.Prepared();
     }
 }

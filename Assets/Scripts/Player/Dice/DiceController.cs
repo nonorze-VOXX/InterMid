@@ -31,7 +31,7 @@ public class DiceController
             yield return new WaitForSeconds(0.1f);
         }
 
-        onRollEnd.Invoke();
+        onRollEnd?.Invoke();
     }
 
     public void AddOnMoveDoneListener(UnityAction action)

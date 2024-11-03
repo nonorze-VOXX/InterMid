@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using Random = UnityEngine.Random;
@@ -16,11 +17,11 @@ internal enum GameState
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private Player playerPrefab;
-
     // IGameFlow _gameFlow;
 
     private readonly HashSet<Player> playerPrepared = new();
     private GameState _gameState;
+    private TMP_Text _gameStateText;
 
     private Player[] _players = new Player[2];
     private Player attacker;
@@ -28,18 +29,34 @@ public class GameManager : MonoBehaviour
 
     private UnityAction OnBeforeBattle;
 
+    private UnityAction<bool> OnDebugMode;
+
+    private GameState gameState
+    {
+        get => _gameState;
+        set
+        {
+            _gameState = value;
+            _gameStateText.text = "Game State: " + _gameState;
+            Debug.Log("Game State: " + _gameState);
+        }
+    }
+
     // Start is called before the first frame update
     private void Start()
     {
         // _gameFlow = new GameFlow.Welcome();
-        _gameState = GameState.Welcome;
+        _gameStateText = GetComponentInChildren<TMP_Text>();
+        gameState = GameState.Welcome;
         _players = new Player[2];
     }
 
     // Update is called once per frame
     private void Update()
     {
-        switch (_gameState)
+        if (Input.GetKeyDown(KeyCode.Tab)) DebugMode();
+
+        switch (gameState)
         {
             case GameState.Welcome:
                 if (Input.GetKeyDown(KeyCode.S))
@@ -54,13 +71,17 @@ public class GameManager : MonoBehaviour
                     _players[0].AddListener(AddPlayerPrepared);
                     _players[1].AddListener(AddPlayerPrepared);
                     attacker = p1First ? _players[0] : _players[1];
+                    OnDebugMode += attacker.SetDebug;
+                    attacker.SetDebug(_gameStateText.enabled);
                     OnBeforeBattle += attacker.ReceiveBeforeBattleSignal;
                     defender = !p1First ? _players[0] : _players[1];
+                    defender.SetDebug(_gameStateText.enabled);
+                    OnDebugMode += defender.SetDebug;
                     OnBeforeBattle += defender.ReceiveBeforeBattleSignal;
-                    attacker.transform.position = new Vector3(-5, 0, 0);
-                    defender.transform.position = new Vector3(5, 0, 0);
+                    attacker.transform.position = new Vector3(-5, -2, 0);
+                    defender.transform.position = new Vector3(5, -2, 0);
                     playerPrepared.Clear();
-                    _gameState = GameState.BeforeBattle;
+                    gameState = GameState.BeforeBattle;
                     OnBeforeBattle?.Invoke();
                 }
 
@@ -83,13 +104,22 @@ public class GameManager : MonoBehaviour
                 //     Judege(p1.Value, p2.Value);
                 break;
             case GameState.BattleAnimation:
-                _gameState = GameState.Battle;
+                gameState = GameState.Battle;
                 break;
             case GameState.End:
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
+    }
+
+    private void DebugMode()
+    {
+        // var componentInChildren = GetComponentInChildren<Canvas>();
+        var next = !_gameStateText.enabled;
+        _gameStateText.enabled = next;
+        // componentInChildren.enabled = next;
+        OnDebugMode?.Invoke(next);
     }
 
     private void Judege(int p1, int p2)
@@ -100,7 +130,7 @@ public class GameManager : MonoBehaviour
             Debug.Log("Player 2 win");
         else
             Debug.Log("Draw");
-        _gameState = GameState.BattleAnimation;
+        gameState = GameState.BattleAnimation;
     }
 
 
@@ -109,6 +139,6 @@ public class GameManager : MonoBehaviour
         playerPrepared.Add(player);
         if (playerPrepared.Count == 2)
             // start battle
-            _gameState = GameState.Battle;
+            gameState = GameState.Battle;
     }
 }

@@ -10,6 +10,11 @@ public class PlayerBattleState : IPlayerState
         Atk = attack;
     }
 
+    public override void OnEnter()
+    {
+        base.OnEnter();
+        _m.Prepared();
+    }
 
     public override void Update()
     {
