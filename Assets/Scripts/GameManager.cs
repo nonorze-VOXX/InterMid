@@ -61,7 +61,7 @@ public class GameManager : MonoBehaviour
             case GameState.Welcome:
                 if (Input.GetKeyDown(KeyCode.S))
                 {
-                    Random.InitState(42);
+                    Random.InitState(43);
                     var random_value = Random.Range(0, 6);
                     var p1First = random_value > 3;
                     _players = new[]
@@ -82,6 +82,8 @@ public class GameManager : MonoBehaviour
                     OnBeforeBattle += defender.ReceiveBeforeBattleSignal;
                     attacker.transform.position = new Vector3(-5, -2, 0);
                     defender.transform.position = new Vector3(5, -2, 0);
+                    defender.enemy = attacker;
+                    attacker.enemy = defender;
                     playerPrepared.Clear();
                     gameState = GameState.BeforeBattle;
                     OnBeforeBattle?.Invoke();
@@ -141,16 +143,12 @@ public class GameManager : MonoBehaviour
     private void AddPlayerPrepared(Player player)
     {
         playerPrepared.Add(player);
-        if (playerPrepared.Count == 2 && gameState == GameState.BeforeBattle)
+        if (playerPrepared.Count == 2)
         {
-            // start battle
-            gameState = GameState.Battle;
+            if (gameState == GameState.BeforeBattle) gameState = GameState.Battle;
+            else if (gameState == GameState.Battle) gameState = GameState.End;
+
             playerPrepared.Clear();
         }
-        // else if (playerPrepared.Count == 2 && gameState == GameState.Battle)
-        // {
-        //     attacker.ShootDice(defender);
-        //     playerPrepared.Clear();
-        // }
     }
 }

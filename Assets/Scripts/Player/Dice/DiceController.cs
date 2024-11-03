@@ -5,7 +5,8 @@ using UnityEngine.Events;
 public class DiceController
 {
     private readonly DiceModel model;
-    private readonly DiceView view;
+    private UnityAction<DiceView> onDiceDestroy;
+    private DiceView view;
 
     public DiceController(DiceView view)
     {
@@ -20,6 +21,11 @@ public class DiceController
     {
         var value = Random.Range(1, 7);
         model.SetValue(value);
+    }
+
+    public int GetDiceValue()
+    {
+        return model.GetValue();
     }
 
     public void SetTargetPosition(Vector2 targetPosition)
@@ -56,5 +62,17 @@ public class DiceController
     public void Roll(UnityAction onRollEnd)
     {
         view.RollWithCoroutine(RollWithCoroutine(onRollEnd));
+    }
+
+    public void Destroy()
+    {
+        onDiceDestroy?.Invoke(view);
+        onDiceDestroy = null;
+        view = null;
+    }
+
+    public void AddOnDestroyListener(UnityAction<DiceView> onDiceDestroy)
+    {
+        this.onDiceDestroy += onDiceDestroy;
     }
 }

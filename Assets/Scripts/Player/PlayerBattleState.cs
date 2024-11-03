@@ -18,8 +18,12 @@ public class PlayerBattleState : IPlayerState
         {
             diceControllers.First().SetTargetPosition(_m.GetUsingDicePosition());
             diceControllers.First().SetMoveable(true);
-            diceControllers.First().AddOnMoveDoneListener(() => { _m.Prepared(); });
+            diceControllers.First().AddOnMoveDoneListener(() => { OnMoveDone(); });
         }
+    }
+
+    protected virtual void OnMoveDone()
+    {
     }
 
     public override void Update()

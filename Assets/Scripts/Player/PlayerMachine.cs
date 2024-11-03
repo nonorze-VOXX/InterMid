@@ -60,7 +60,13 @@ public class PlayerMachine
     public void OnStart()
     {
         var diceViews = _player.GetDiceView();
-        for (var i = 0; i < 3; i++) Dices.Add(new DiceController(diceViews[i]));
+        for (var i = 0; i < 3; i++)
+        {
+            var diceController = new DiceController(diceViews[i]);
+            Dices.Add(diceController);
+            diceController.AddOnDestroyListener(_player.OnDiceDestroy);
+        }
+
         State = new ThrowDiceState(this, Dices);
     }
 
@@ -94,5 +100,32 @@ public class PlayerMachine
         return _player.transform.position + new Vector3(-1, 0) *
             Vector2.Dot(_player.transform.position.normalized, Vector2.right)
             ;
+    }
+
+    public Vector2 GetUsingEnemyPosition()
+    {
+        return _player.enemy.GetDiceUsingPosition();
+    }
+
+    public int GetEnemyDiceValue()
+    {
+        return _player.enemy.GetUsingDiceValue();
+    }
+
+    public Vector2 GetFlyOutPosition()
+    {
+        return _player.transform.position + new Vector3(5, 10) *
+            Vector2.Dot(_player.transform.position.normalized, Vector2.right)
+            ;
+    }
+
+    public Vector2 GetEnemyPosition()
+    {
+        return _player.enemy.transform.position;
+    }
+
+    public void CauseDamageToEnemy(int atk)
+    {
+        _player.enemy.TakeDamage(atk);
     }
 }

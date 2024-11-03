@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -9,6 +10,7 @@ public class Player : MonoBehaviour
     [SerializeField] private PlayerMachine _playerMachine;
 
     [SerializeField] private GameObject _DiceViewPrefab;
+    public Player enemy;
 
 
     private readonly List<DiceView> _diceViews = new();
@@ -23,7 +25,7 @@ public class Player : MonoBehaviour
     public void Awake()
     {
         Hp = 100;
-        Atk = 10;
+        Atk = 1;
         _playerMachine = new PlayerMachine(this);
         _stateText = GetComponentInChildren<TMP_Text>();
         _playerMachine.AddListener(OnStateChange);
@@ -87,5 +89,31 @@ public class Player : MonoBehaviour
     public void SetDefender()
     {
         _playerMachine.CombatState = CombatState.Defend;
+    }
+
+    public Vector2 GetDiceUsingPosition()
+    {
+        return _playerMachine.GetUsingDicePosition();
+    }
+
+    public int GetUsingDiceValue()
+    {
+        return _playerMachine.Dices.First().GetDiceValue();
+    }
+
+    public void TakeDamage(int atk)
+    {
+        Hp -= atk;
+        if (Hp <= 0)
+        {
+            Hp = 0;
+            Debug.Log("Player Die");
+        }
+    }
+
+    public void OnDiceDestroy(DiceView arg0)
+    {
+        _diceViews.Remove(arg0);
+        Destroy(arg0);
     }
 }

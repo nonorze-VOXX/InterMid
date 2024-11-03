@@ -28,8 +28,10 @@ public class DiceView : MonoBehaviour
             {
                 // arrived at target position
                 // do something
-                OnDicePrepared?.Invoke();
                 moveable = false;
+                var tmpAction = OnDicePrepared;
+                OnDicePrepared = null;
+                tmpAction?.Invoke();
             }
         }
         // move towards target position
