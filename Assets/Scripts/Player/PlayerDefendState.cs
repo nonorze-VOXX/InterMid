@@ -1,7 +1,7 @@
 ﻿using System;
 
 [Serializable]
-public class PlayerDefendState : IPlayerState
+public class PlayerDefendState : PlayerBattleState
 {
     public PlayerDefendState(PlayerMachine m) : base(m)
     {

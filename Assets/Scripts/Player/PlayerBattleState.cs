@@ -1,19 +1,25 @@
-﻿using System;
+﻿using System.Linq;
 
-[Serializable]
 public class PlayerBattleState : IPlayerState
 {
-    private int Atk;
-
-    public PlayerBattleState(PlayerMachine m, int attack) : base(m)
+    public PlayerBattleState(PlayerMachine m) : base(m)
     {
-        Atk = attack;
     }
 
     public override void OnEnter()
     {
         base.OnEnter();
-        _m.Prepared();
+        var diceControllers = _m.Dices;
+        if (diceControllers.Count == 0)
+        {
+            _m.Prepared();
+        }
+        else
+        {
+            diceControllers.First().SetTargetPosition(_m.GetUsingDicePosition());
+            diceControllers.First().SetMoveable(true);
+            diceControllers.First().AddOnMoveDoneListener(() => { _m.Prepared(); });
+        }
     }
 
     public override void Update()

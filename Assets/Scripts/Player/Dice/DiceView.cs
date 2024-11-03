@@ -6,10 +6,12 @@ using UnityEngine.Events;
 public class DiceView : MonoBehaviour
 {
     private TMP_Text _text;
-    private readonly bool moveable = false;
+
     private UnityAction OnDicePrepared;
 
     private Vector2 position = new(0, 0);
+
+    public bool moveable { get; set; }
 
     private void Awake()
     {
@@ -21,10 +23,14 @@ public class DiceView : MonoBehaviour
         if (moveable)
         {
             transform.position = Vector2.MoveTowards(transform.position, position, 5 * Time.deltaTime);
+
             if (Vector2.Distance(transform.position, position) < 0.1f)
+            {
                 // arrived at target position
                 // do something
                 OnDicePrepared?.Invoke();
+                moveable = false;
+            }
         }
         // move towards target position
     }

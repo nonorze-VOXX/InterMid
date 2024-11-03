@@ -10,6 +10,7 @@ public class Player : MonoBehaviour
 
     [SerializeField] private GameObject _DiceViewPrefab;
 
+
     private readonly List<DiceView> _diceViews = new();
     private TMP_Text _stateText;
     private bool isBeforeBattleSignal;
@@ -19,8 +20,7 @@ public class Player : MonoBehaviour
     [SerializeField] public int Hp { get; set; }
     [SerializeField] public int Atk { get; set; }
 
-
-    public void Start()
+    public void Awake()
     {
         Hp = 100;
         Atk = 10;
@@ -77,5 +77,15 @@ public class Player : MonoBehaviour
     public void ReceiveBeforeBattleSignal()
     {
         isBeforeBattleSignal = true;
+    }
+
+    public void SetAttacker()
+    {
+        _playerMachine.CombatState = CombatState.Attack;
+    }
+
+    public void SetDefender()
+    {
+        _playerMachine.CombatState = CombatState.Defend;
     }
 }

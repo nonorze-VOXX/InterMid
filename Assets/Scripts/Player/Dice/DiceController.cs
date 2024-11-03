@@ -22,12 +22,16 @@ public class DiceController
         model.SetValue(value);
     }
 
+    public void SetTargetPosition(Vector2 targetPosition)
+    {
+        view.SetTargetPosition(targetPosition);
+    }
+
     public IEnumerator RollWithCoroutine(UnityAction onRollEnd)
     {
         for (var i = 0; i < 10; i++)
         {
-            var value = Random.Range(1, 7);
-            model.SetValue(value);
+            Roll();
             yield return new WaitForSeconds(0.1f);
         }
 
@@ -37,6 +41,11 @@ public class DiceController
     public void AddOnMoveDoneListener(UnityAction action)
     {
         view.AddListener(action);
+    }
+
+    public void SetMoveable(bool b)
+    {
+        view.moveable = b;
     }
 
     public void SetViewActive(bool b)

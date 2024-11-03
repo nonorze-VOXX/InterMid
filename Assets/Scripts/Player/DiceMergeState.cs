@@ -11,5 +11,6 @@
 
     public override void OnExit()
     {
+        _m.Prepared();
     }
 }

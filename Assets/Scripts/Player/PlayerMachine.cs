@@ -1,16 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Events;
+
+public enum CombatState
+{
+    Defend,
+    Attack,
+    NotAssigned
+}
 
 [Serializable]
 public class PlayerMachine
 {
-    // private readonly CombatState _combatState;
-
     private readonly Player _player;
+    private CombatState _combatState;
 
     // UnityAction OnPlayerPrepared;
-    private List<DiceController> _dices = new();
 
     private IPlayerState _state;
 
@@ -20,9 +26,17 @@ public class PlayerMachine
     public PlayerMachine(Player player)
     {
         _player = player;
-        // _combatState = combatState;
-        // OnStart();
+        _combatState = CombatState.NotAssigned;
     }
+
+    public CombatState CombatState
+    {
+        get => _combatState;
+        set => _combatState = value;
+        // Debug.Log("Combat State: " + _combatState);
+    }
+
+    public List<DiceController> Dices { get; } = new();
 
     private IPlayerState State
     {
@@ -46,8 +60,8 @@ public class PlayerMachine
     public void OnStart()
     {
         var diceViews = _player.GetDiceView();
-        for (var i = 0; i < 3; i++) _dices.Add(new DiceController(diceViews[i]));
-        State = new ThrowDiceState(this, _dices);
+        for (var i = 0; i < 3; i++) Dices.Add(new DiceController(diceViews[i]));
+        State = new ThrowDiceState(this, Dices);
     }
 
     public void Update()
@@ -62,11 +76,23 @@ public class PlayerMachine
 
     public void ToBattleState()
     {
-        State = new PlayerBattleState(this, _player.Atk);
+        if (CombatState == CombatState.Attack)
+            State = new PlayerAttackState(this, _player.Atk);
+        else if (CombatState == CombatState.Defend)
+            State = new PlayerDefendState(this);
+        else
+            Debug.Log("no assign and battleing ");
     }
 
     public void Prepared()
     {
         _player.Prepared();
+    }
+
+    public Vector2 GetUsingDicePosition()
+    {
+        return _player.transform.position + new Vector3(-1, 0) *
+            Vector2.Dot(_player.transform.position.normalized, Vector2.right)
+            ;
     }
 }

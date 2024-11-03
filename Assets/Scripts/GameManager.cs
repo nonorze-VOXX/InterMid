@@ -73,8 +73,10 @@ public class GameManager : MonoBehaviour
                     attacker = p1First ? _players[0] : _players[1];
                     OnDebugMode += attacker.SetDebug;
                     attacker.SetDebug(_gameStateText.enabled);
+                    attacker.SetAttacker();
                     OnBeforeBattle += attacker.ReceiveBeforeBattleSignal;
                     defender = !p1First ? _players[0] : _players[1];
+                    defender.SetDefender();
                     defender.SetDebug(_gameStateText.enabled);
                     OnDebugMode += defender.SetDebug;
                     OnBeforeBattle += defender.ReceiveBeforeBattleSignal;
@@ -102,6 +104,8 @@ public class GameManager : MonoBehaviour
                 //     Debug.Log("Draw");
                 // else
                 //     Judege(p1.Value, p2.Value);
+                // attacker.GetDiceView();
+
                 break;
             case GameState.BattleAnimation:
                 gameState = GameState.Battle;
@@ -137,8 +141,16 @@ public class GameManager : MonoBehaviour
     private void AddPlayerPrepared(Player player)
     {
         playerPrepared.Add(player);
-        if (playerPrepared.Count == 2)
+        if (playerPrepared.Count == 2 && gameState == GameState.BeforeBattle)
+        {
             // start battle
             gameState = GameState.Battle;
+            playerPrepared.Clear();
+        }
+        // else if (playerPrepared.Count == 2 && gameState == GameState.Battle)
+        // {
+        //     attacker.ShootDice(defender);
+        //     playerPrepared.Clear();
+        // }
     }
 }
