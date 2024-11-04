@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 internal enum GameState
@@ -82,6 +83,10 @@ public class GameManager : MonoBehaviour
                     OnBeforeBattle += defender.ReceiveBeforeBattleSignal;
                     attacker.transform.position = new Vector3(-5, -2, 0);
                     defender.transform.position = new Vector3(5, -2, 0);
+                    var pos = defender.GetComponentInChildren<Slider>().transform.localPosition;
+                    pos.x *= -1;
+                    defender.GetComponentInChildren<Slider>().transform.localPosition = pos;
+                    defender.GetComponentInChildren<Image>().transform.localRotation = Quaternion.Euler(0, 180, 0);
                     defender.enemy = attacker;
                     attacker.enemy = defender;
                     playerPrepared.Clear();

@@ -3,35 +3,56 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
     public static float DiceDistance = 1.5f;
+    public static int fullHp = 100;
     [SerializeField] private PlayerMachine _playerMachine;
 
     [SerializeField] private GameObject _DiceViewPrefab;
     public Player enemy;
 
+    [SerializeField] private int _hp;
+
 
     private readonly List<DiceView> _diceViews = new();
     private TMP_Text _stateText;
+    private Slider hpSlider;
     private bool isBeforeBattleSignal;
+    private UnityAction<float> onHpChange;
 
     private UnityAction<Player> OnPlayerPrepared;
 
-    [SerializeField] public int Hp { get; set; }
+    [SerializeField]
+    public int Hp
+    {
+        get => _hp;
+        set
+        {
+            _hp = value;
+            onHpChange?.Invoke((float)_hp / fullHp);
+        }
+    }
+
     [SerializeField] public int Atk { get; set; }
+
 
     public void Awake()
     {
-        Hp = 100;
-        Atk = 1;
+        hpSlider = GetComponentInChildren<Slider>();
+        onHpChange += OnHpChange;
         _playerMachine = new PlayerMachine(this);
         _stateText = GetComponentInChildren<TMP_Text>();
         _playerMachine.AddListener(OnStateChange);
 
+        Hp = fullHp;
+        Atk = 1;
+
         // DiceInit();
     }
+
 
     private void Start()
     {
@@ -42,6 +63,11 @@ public class Player : MonoBehaviour
     {
         if (isBeforeBattleSignal)
             _playerMachine.Update();
+    }
+
+    public void OnHpChange(float percent)
+    {
+        hpSlider.value = percent;
     }
 
     private void DiceInit()
