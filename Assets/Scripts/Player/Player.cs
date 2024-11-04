@@ -144,4 +144,9 @@ public class Player : MonoBehaviour
     {
         _playerMachine.DefenderGetAttackerShootDone();
     }
+
+    public void NextTurn()
+    {
+        _playerMachine.NextTurn();
+    }
 }

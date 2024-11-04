@@ -169,12 +169,13 @@ public class PlayerMachine
 
     public void AttackerRunOutDice()
     {
-        _player.enemy.ToThrowState();
-        ToThrowState();
+        _player.enemy.NextTurn();
+        NextTurn();
     }
 
-    public void DefendNoDice()
+    public void NextTurn()
     {
-        throw new NotImplementedException();
+        CombatState = CombatState == CombatState.Attack ? CombatState.Defend : CombatState.Attack;
+        ToThrowState();
     }
 }
