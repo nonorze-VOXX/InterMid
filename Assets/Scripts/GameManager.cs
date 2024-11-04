@@ -15,6 +15,12 @@ internal enum GameState
     BattleAnimation
 }
 
+internal enum TextIndex
+{
+    GameState,
+    Turn
+}
+
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private Player playerPrefab;
@@ -25,12 +31,25 @@ public class GameManager : MonoBehaviour
     private TMP_Text _gameStateText;
 
     private Player[] _players = new Player[2];
+
+    private int _turn;
+    private TMP_Text _turnText;
     private Player attacker;
     private Player defender;
 
     private UnityAction OnBeforeBattle;
 
     private UnityAction<bool> OnDebugMode;
+
+    private int turn
+    {
+        get => _turn;
+        set
+        {
+            _turn = value;
+            _turnText.text = "Turn: " + turn;
+        }
+    }
 
     private GameState gameState
     {
@@ -47,7 +66,8 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         // _gameFlow = new GameFlow.Welcome();
-        _gameStateText = GetComponentInChildren<TMP_Text>();
+        _gameStateText = GetComponentsInChildren<TMP_Text>()[(int)TextIndex.GameState];
+        _turnText = GetComponentsInChildren<TMP_Text>()[(int)TextIndex.Turn];
         gameState = GameState.Welcome;
         _players = new Player[2];
     }
@@ -74,10 +94,12 @@ public class GameManager : MonoBehaviour
                     attacker = p1First ? _players[0] : _players[1];
                     OnDebugMode += attacker.SetDebug;
                     attacker.SetDebug(_gameStateText.enabled);
+                    attacker.AddTurnAddOneListener(BattleEnd);
                     attacker.SetAttacker();
                     OnBeforeBattle += attacker.ReceiveBeforeBattleSignal;
                     defender = !p1First ? _players[0] : _players[1];
                     defender.SetDefender();
+                    defender.AddTurnAddOneListener(BattleEnd);
                     defender.SetDebug(_gameStateText.enabled);
                     OnDebugMode += defender.SetDebug;
                     OnBeforeBattle += defender.ReceiveBeforeBattleSignal;
@@ -92,6 +114,7 @@ public class GameManager : MonoBehaviour
                     playerPrepared.Clear();
                     gameState = GameState.BeforeBattle;
                     OnBeforeBattle?.Invoke();
+                    turn = 1;
                 }
 
                 break;
@@ -123,6 +146,13 @@ public class GameManager : MonoBehaviour
                 throw new ArgumentOutOfRangeException();
         }
     }
+
+    private void BattleEnd()
+    {
+        gameState = GameState.BeforeBattle;
+        turn++;
+    }
+
 
     private void DebugMode()
     {

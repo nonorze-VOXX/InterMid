@@ -10,11 +10,9 @@ public enum CombatState
     NotAssigned
 }
 
-[Serializable]
 public class PlayerMachine
 {
     private readonly Player _player;
-    private CombatState _combatState;
 
 
     private IPlayerState _state;
@@ -27,14 +25,10 @@ public class PlayerMachine
     public PlayerMachine(Player player)
     {
         _player = player;
-        _combatState = CombatState.NotAssigned;
+        CombatState = CombatState.NotAssigned;
     }
 
-    public CombatState CombatState
-    {
-        get => _combatState;
-        set => _combatState = value;
-    }
+    public CombatState CombatState { get; set; }
 
     public List<DiceController> Dices { get; } = new();
 
@@ -75,7 +69,7 @@ public class PlayerMachine
             var diceView = diceViews[i];
             var image = diceView.GetComponentInChildren<SpriteRenderer>();
 
-            var colorHex = _combatState == CombatState.Attack ? "#933E3E" : "#578DD4";
+            var colorHex = CombatState == CombatState.Attack ? "#933E3E" : "#578DD4";
 
             if (ColorUtility.TryParseHtmlString(colorHex, out var newColor))
                 image.color = newColor;
@@ -180,6 +174,7 @@ public class PlayerMachine
 
     public void AttackerRunOutDice()
     {
+        _player.TurnEnd();
         _player.enemy.NextTurn();
         NextTurn();
     }

@@ -25,6 +25,8 @@ public class Player : MonoBehaviour
 
     private UnityAction<Player> OnPlayerPrepared;
 
+    private UnityAction OnTurnAddOne;
+
     [SerializeField]
     public int Hp
     {
@@ -177,5 +179,15 @@ public class Player : MonoBehaviour
     public void NextTurn()
     {
         _playerMachine.NextTurn();
+    }
+
+    public void AddTurnAddOneListener(UnityAction action)
+    {
+        OnTurnAddOne += action;
+    }
+
+    public void TurnEnd()
+    {
+        OnTurnAddOne?.Invoke();
     }
 }
