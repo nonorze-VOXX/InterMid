@@ -5,6 +5,7 @@ using UnityEngine.Events;
 
 public class DiceView : MonoBehaviour
 {
+    public float diceSpeed = 5;
     private TMP_Text _text;
 
     private UnityAction OnDicePrepared;
@@ -22,7 +23,7 @@ public class DiceView : MonoBehaviour
     {
         if (moveable)
         {
-            transform.position = Vector2.MoveTowards(transform.position, position, 5 * Time.deltaTime);
+            transform.position = Vector2.MoveTowards(transform.position, position, diceSpeed * Time.deltaTime);
 
             if (Vector2.Distance(transform.position, position) < 0.1f)
             {
@@ -47,6 +48,19 @@ public class DiceView : MonoBehaviour
         position = targetPosition;
     }
 
+    public void SetMoveSpeed(DiceMoveSpeed speed)
+    {
+        switch (speed)
+        {
+            case DiceMoveSpeed.Normal:
+                diceSpeed = 5;
+                break;
+            case DiceMoveSpeed.Fast:
+                diceSpeed = 20;
+                break;
+        }
+    }
+
     public void AddListener(UnityAction action)
     {
         OnDicePrepared += action;
@@ -56,4 +70,10 @@ public class DiceView : MonoBehaviour
     {
         StartCoroutine(rollWithCoroutine);
     }
+}
+
+public enum DiceMoveSpeed
+{
+    Normal,
+    Fast
 }

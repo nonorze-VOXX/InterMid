@@ -14,7 +14,7 @@ public class PlayerBattleState : IPlayerState
         if (diceControllers.Count == 0)
             _m.Prepared();
         else
-            diceControllers.First().SetTargetPosition(_m.GetUsingDicePosition(), () => { OnMoveDone(); });
+            diceControllers.First().Shoot(_m.GetUsingDicePosition(), () => { OnMoveDone(); });
     }
 
 

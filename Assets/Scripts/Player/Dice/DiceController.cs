@@ -61,9 +61,18 @@ public class DiceController
         this.onDiceDestroy += onDiceDestroy;
     }
 
-    public void SetTargetPosition(Vector2 getUsingDicePosition, UnityAction action)
+    public void Shoot(Vector2 getUsingDicePosition, UnityAction action)
     {
         view.SetTargetPosition(getUsingDicePosition);
+        view.SetMoveSpeed(DiceMoveSpeed.Normal);
+        view.moveable = true;
+        view.AddListener(action);
+    }
+
+    public void Shoot(Vector2 getUsingDicePosition, DiceMoveSpeed speed, UnityAction action)
+    {
+        view.SetTargetPosition(getUsingDicePosition);
+        view.SetMoveSpeed(speed);
         view.moveable = true;
         view.AddListener(action);
     }

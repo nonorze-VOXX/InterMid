@@ -72,7 +72,17 @@ public class PlayerMachine
         var diceViews = _player.GetNewDiceView();
         for (var i = 0; i < 3; i++)
         {
-            var diceController = new DiceController(diceViews[i]);
+            var diceView = diceViews[i];
+            var image = diceView.GetComponentInChildren<SpriteRenderer>();
+
+            var colorHex = _combatState == CombatState.Attack ? "#933E3E" : "#578DD4";
+
+            if (ColorUtility.TryParseHtmlString(colorHex, out var newColor))
+                image.color = newColor;
+            else
+                Debug.LogError("Invalid color code.");
+
+            var diceController = new DiceController(diceView);
             Dices.Add(diceController);
             diceController.AddOnDestroyListener(_player.OnDiceDestroy);
         }
@@ -132,8 +142,9 @@ public class PlayerMachine
 
     public Vector2 GetFlyOutPosition()
     {
-        return _player.transform.position + new Vector3(5, 10) *
-            Vector2.Dot(_player.transform.position.normalized, Vector2.right)
+        return _player.transform.position + new Vector3(5, 0) *
+                                          Vector2.Dot(_player.transform.position.normalized, Vector2.right)
+                                          + new Vector3(0, 10)
             ;
     }
 

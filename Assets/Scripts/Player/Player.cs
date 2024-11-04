@@ -31,7 +31,10 @@ public class Player : MonoBehaviour
         _playerMachine.AddListener(OnStateChange);
 
         // DiceInit();
+    }
 
+    private void Start()
+    {
         _playerMachine.OnStart();
     }
 
