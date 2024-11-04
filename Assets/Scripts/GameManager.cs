@@ -61,7 +61,7 @@ public class GameManager : MonoBehaviour
             case GameState.Welcome:
                 if (Input.GetKeyDown(KeyCode.S))
                 {
-                    Random.InitState(43);
+                    Random.InitState(42);
                     var random_value = Random.Range(0, 6);
                     var p1First = random_value > 3;
                     _players = new[]
@@ -145,7 +145,8 @@ public class GameManager : MonoBehaviour
         playerPrepared.Add(player);
         if (playerPrepared.Count == 2)
         {
-            if (gameState == GameState.BeforeBattle) gameState = GameState.Battle;
+            if (gameState == GameState.BeforeBattle)
+                gameState = GameState.Battle;
             else if (gameState == GameState.Battle) gameState = GameState.End;
 
             playerPrepared.Clear();

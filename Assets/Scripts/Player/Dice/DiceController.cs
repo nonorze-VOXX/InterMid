@@ -28,11 +28,6 @@ public class DiceController
         return model.GetValue();
     }
 
-    public void SetTargetPosition(Vector2 targetPosition)
-    {
-        view.SetTargetPosition(targetPosition);
-    }
-
     public IEnumerator RollWithCoroutine(UnityAction onRollEnd)
     {
         for (var i = 0; i < 10; i++)
@@ -42,16 +37,6 @@ public class DiceController
         }
 
         onRollEnd?.Invoke();
-    }
-
-    public void AddOnMoveDoneListener(UnityAction action)
-    {
-        view.AddListener(action);
-    }
-
-    public void SetMoveable(bool b)
-    {
-        view.moveable = b;
     }
 
     public void SetViewActive(bool b)
@@ -74,5 +59,12 @@ public class DiceController
     public void AddOnDestroyListener(UnityAction<DiceView> onDiceDestroy)
     {
         this.onDiceDestroy += onDiceDestroy;
+    }
+
+    public void SetTargetPosition(Vector2 getUsingDicePosition, UnityAction action)
+    {
+        view.SetTargetPosition(getUsingDicePosition);
+        view.moveable = true;
+        view.AddListener(action);
     }
 }

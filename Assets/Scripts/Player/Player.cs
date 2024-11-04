@@ -29,6 +29,21 @@ public class Player : MonoBehaviour
         _playerMachine = new PlayerMachine(this);
         _stateText = GetComponentInChildren<TMP_Text>();
         _playerMachine.AddListener(OnStateChange);
+
+        // DiceInit();
+
+        _playerMachine.OnStart();
+    }
+
+    private void Update()
+    {
+        if (isBeforeBattleSignal)
+            _playerMachine.Update();
+    }
+
+    private void DiceInit()
+    {
+        _diceViews.Clear();
         for (var i = 0; i < 3; i++)
         {
             var transformPosition = transform.position + new Vector3(0, DiceDistance * (1 + i));
@@ -37,15 +52,6 @@ public class Player : MonoBehaviour
             diceView.gameObject.SetActive(false);
             _diceViews.Add(diceView);
         }
-
-        _playerMachine.OnStart();
-    }
-
-    private void Update()
-    {
-        // if (Input.GetKeyDown(KeyCode.S)) Prepared();
-        if (isBeforeBattleSignal)
-            _playerMachine.Update();
     }
 
     public void SetDebug(bool b)
@@ -56,7 +62,7 @@ public class Player : MonoBehaviour
 
     private void OnStateChange(string arg0)
     {
-        print("state change" + arg0);
+        // print("state change" + arg0);
         _stateText.text = arg0;
     }
 
@@ -114,6 +120,28 @@ public class Player : MonoBehaviour
     public void OnDiceDestroy(DiceView arg0)
     {
         _diceViews.Remove(arg0);
-        Destroy(arg0);
+        print("destroy dice view" + arg0 + " " + arg0.transform.position);
+        Destroy(arg0.gameObject);
+    }
+
+    public void DefenderPreparedAcceptAttack()
+    {
+        _playerMachine.AttackerReceiveDefenderPrepared();
+    }
+
+    public List<DiceView> GetNewDiceView()
+    {
+        DiceInit();
+        return _diceViews;
+    }
+
+    public void ToThrowState()
+    {
+        _playerMachine.ToThrowState();
+    }
+
+    public void DefenderGetAttackerShootDone()
+    {
+        _playerMachine.DefenderGetAttackerShootDone();
     }
 }

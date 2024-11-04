@@ -16,11 +16,12 @@ public class PlayerMachine
     private readonly Player _player;
     private CombatState _combatState;
 
-    // UnityAction OnPlayerPrepared;
 
     private IPlayerState _state;
 
     private UnityAction<string> OnStateChange;
+    private PlayerAttackState playerAttackState;
+    private PlayerDefendState playerDefendState;
 
 
     public PlayerMachine(Player player)
@@ -33,7 +34,6 @@ public class PlayerMachine
     {
         get => _combatState;
         set => _combatState = value;
-        // Debug.Log("Combat State: " + _combatState);
     }
 
     public List<DiceController> Dices { get; } = new();
@@ -51,6 +51,11 @@ public class PlayerMachine
         }
     }
 
+    public void InvokeStateChangeWithBattleState(string battleState)
+    {
+        OnStateChange?.Invoke("Player State: " + _state.GetType().Name + " " + battleState);
+    }
+
     public void AddListener(UnityAction<string> action)
     {
         OnStateChange += action;
@@ -59,7 +64,12 @@ public class PlayerMachine
 
     public void OnStart()
     {
-        var diceViews = _player.GetDiceView();
+        ToThrowState();
+    }
+
+    public void ToThrowState()
+    {
+        var diceViews = _player.GetNewDiceView();
         for (var i = 0; i < 3; i++)
         {
             var diceController = new DiceController(diceViews[i]);
@@ -83,11 +93,19 @@ public class PlayerMachine
     public void ToBattleState()
     {
         if (CombatState == CombatState.Attack)
-            State = new PlayerAttackState(this, _player.Atk);
+        {
+            playerAttackState = new PlayerAttackState(this, _player.Atk);
+            State = playerAttackState;
+        }
         else if (CombatState == CombatState.Defend)
-            State = new PlayerDefendState(this);
+        {
+            playerDefendState = new PlayerDefendState(this);
+            State = playerDefendState;
+        }
         else
+        {
             Debug.Log("no assign and battleing ");
+        }
     }
 
     public void Prepared()
@@ -127,5 +145,36 @@ public class PlayerMachine
     public void CauseDamageToEnemy(int atk)
     {
         _player.enemy.TakeDamage(atk);
+    }
+
+    public void DefenderMoveDone()
+    {
+        _player.enemy.DefenderPreparedAcceptAttack();
+    }
+
+    public void AttackerReceiveDefenderPrepared()
+    {
+        playerAttackState.AttackerReceiveDefenderPrepared();
+    }
+
+    public void AttackerShootDone()
+    {
+        _player.enemy.DefenderGetAttackerShootDone();
+    }
+
+    public void DefenderGetAttackerShootDone()
+    {
+        playerDefendState.AttackerShootDone();
+    }
+
+    public void AttackerRunOutDice()
+    {
+        _player.enemy.ToThrowState();
+        ToThrowState();
+    }
+
+    public void DefendNoDice()
+    {
+        throw new NotImplementedException();
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using UnityEngine;
 
 public class PlayerBattleState : IPlayerState
 {
@@ -11,19 +12,15 @@ public class PlayerBattleState : IPlayerState
         base.OnEnter();
         var diceControllers = _m.Dices;
         if (diceControllers.Count == 0)
-        {
             _m.Prepared();
-        }
         else
-        {
-            diceControllers.First().SetTargetPosition(_m.GetUsingDicePosition());
-            diceControllers.First().SetMoveable(true);
-            diceControllers.First().AddOnMoveDoneListener(() => { OnMoveDone(); });
-        }
+            diceControllers.First().SetTargetPosition(_m.GetUsingDicePosition(), () => { OnMoveDone(); });
     }
+
 
     protected virtual void OnMoveDone()
     {
+        Debug.Log(_m.CombatState + "move doen");
     }
 
     public override void Update()
