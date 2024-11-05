@@ -80,6 +80,47 @@ public class GameManager : MonoBehaviour
         welcomeText.text = "Press R to start";
         welcomeText.enabled = true;
         Random.InitState(42);
+
+        #region initPlayer
+
+        _players = new[]
+        {
+            Instantiate(playerPrefab), Instantiate(playerPrefab)
+        };
+        Player attacker;
+        Player defender;
+        _players[0].AddListener(AddPlayerPrepared);
+        _players[1].AddListener(AddPlayerPrepared);
+        var random_value = Random.Range(0, 6);
+        var p1First = random_value > 3;
+        attacker = p1First ? _players[0] : _players[1];
+
+        OnDebugMode += attacker.SetDebug;
+        attacker.SetDebug(_gameStateText.enabled);
+        attacker.AddTurnAddOneListener(BattleEnd);
+        attacker.SetAttacker();
+        OnBeforeBattle += attacker.ReceiveBeforeBattleSignal;
+        defender = !p1First ? _players[0] : _players[1];
+        defender.SetDefender();
+        defender.AddTurnAddOneListener(BattleEnd);
+        defender.SetDebug(_gameStateText.enabled);
+        OnDebugMode += defender.SetDebug;
+        OnBeforeBattle += defender.ReceiveBeforeBattleSignal;
+        attacker.transform.position = new Vector3(-5, -2, 0);
+        attacker.AddPlayerDieListener(OnPlayerDie);
+        defender.AddPlayerDieListener(OnPlayerDie);
+        defender.transform.position = new Vector3(5, -2, 0);
+        var pos = defender.GetComponentInChildren<Slider>().transform.localPosition;
+        pos.x *= -1;
+        defender.GetComponentInChildren<Slider>().transform.localPosition = pos;
+        defender.GetComponentInChildren<Image>().transform.localRotation = Quaternion.Euler(0, 180, 0);
+        defender.enemy = attacker;
+        attacker.enemy = defender;
+        attacker.transform.name = "Player1";
+        defender.transform.name = "Player2";
+        foreach (var player in _players) player.gameObject.SetActive(false);
+
+        #endregion
     }
 
     // Update is called once per frame
@@ -93,47 +134,13 @@ public class GameManager : MonoBehaviour
                 if (Input.GetKeyDown(KeyCode.R))
                 {
                     welcomeText.enabled = false;
-                    var random_value = Random.Range(0, 6);
-                    var p1First = random_value > 3;
-                    _players = new[]
-                    {
-                        Instantiate(playerPrefab), Instantiate(playerPrefab)
-                    };
-                    Player attacker;
-                    Player defender;
-                    _players[0].AddListener(AddPlayerPrepared);
-                    _players[1].AddListener(AddPlayerPrepared);
-                    attacker = p1First ? _players[0] : _players[1];
-
-                    OnDebugMode += attacker.SetDebug;
-                    attacker.SetDebug(_gameStateText.enabled);
-                    attacker.AddTurnAddOneListener(BattleEnd);
-                    attacker.SetAttacker();
-                    OnBeforeBattle += attacker.ReceiveBeforeBattleSignal;
-                    defender = !p1First ? _players[0] : _players[1];
-                    defender.SetDefender();
-                    defender.AddTurnAddOneListener(BattleEnd);
-                    defender.SetDebug(_gameStateText.enabled);
-                    OnDebugMode += defender.SetDebug;
-                    OnBeforeBattle += defender.ReceiveBeforeBattleSignal;
-                    attacker.transform.position = new Vector3(-5, -2, 0);
-                    attacker.AddPlayerDieListener(OnPlayerDie);
-                    defender.AddPlayerDieListener(OnPlayerDie);
-                    defender.transform.position = new Vector3(5, -2, 0);
-                    var pos = defender.GetComponentInChildren<Slider>().transform.localPosition;
-                    pos.x *= -1;
-                    defender.GetComponentInChildren<Slider>().transform.localPosition = pos;
-                    defender.GetComponentInChildren<Image>().transform.localRotation = Quaternion.Euler(0, 180, 0);
-                    defender.enemy = attacker;
-                    attacker.enemy = defender;
                     playerPrepared.Clear();
                     gameState = GameState.BeforeBattle;
                     OnBeforeBattle?.Invoke();
-                    attacker.transform.name = "Player1";
-                    defender.transform.name = "Player2";
                     _turnText.enabled = true;
                     turn = 1;
                     diePlayer = null;
+                    foreach (var player in _players) player.gameObject.SetActive(true);
                 }
 
                 break;
@@ -187,9 +194,6 @@ public class GameManager : MonoBehaviour
             welcomeText.text = "Player " + player.enemy.name + " Win!\n Press R to restart";
             welcomeText.enabled = true;
             print("Player " + player.enemy.name + " Win!");
-            print("destroy player");
-            Destroy(player.enemy.gameObject);
-            Destroy(player.gameObject);
         }
         else
         {
