@@ -14,6 +14,7 @@ public class Player : MonoBehaviour
     public Player enemy;
 
     [SerializeField] private int _hp;
+    [SerializeField] private int _score;
 
 
     private readonly List<DiceView> _diceViews = new();
@@ -23,9 +24,17 @@ public class Player : MonoBehaviour
     private bool isBeforeBattleSignal;
     private UnityAction<float> onHpChange;
 
+    private UnityAction<Player> OnPlayerDie;
+
     private UnityAction<Player> OnPlayerPrepared;
 
     private UnityAction OnTurnAddOne;
+
+    public int score
+    {
+        get => _score;
+        set => _score = value;
+    }
 
     [SerializeField]
     public int Hp
@@ -50,7 +59,7 @@ public class Player : MonoBehaviour
         _playerMachine.AddListener(OnStateChange);
 
         Hp = fullHp;
-        Atk = 1;
+        Atk = 100;
 
         // DiceInit();
     }
@@ -65,6 +74,14 @@ public class Player : MonoBehaviour
     {
         if (isBeforeBattleSignal)
             _playerMachine.Update();
+    }
+
+    private void OnDestroy()
+    {
+        onHpChange = null;
+        OnPlayerDie = null;
+        OnPlayerPrepared = null;
+        OnTurnAddOne = null;
     }
 
     public void OnHpChange(float percent)
@@ -87,7 +104,7 @@ public class Player : MonoBehaviour
 
     public void SetDebug(bool b)
     {
-        var componentInChildren = GetComponentInChildren<Canvas>();
+        var componentInChildren = GetComponentInChildren<TMP_Text>();
         componentInChildren.enabled = b;
     }
 
@@ -138,20 +155,25 @@ public class Player : MonoBehaviour
         return _playerMachine.Dices.First().GetDiceValue();
     }
 
+    public void AddPlayerDieListener(UnityAction<Player> action)
+    {
+        OnPlayerDie += action;
+    }
+
     public void TakeDamage(int atk)
     {
         Hp -= atk;
         if (Hp <= 0)
         {
             Hp = 0;
-            Debug.Log("Player Die");
+
+            OnPlayerDie?.Invoke(this);
         }
     }
 
     public void OnDiceDestroy(DiceView arg0)
     {
         _diceViews.Remove(arg0);
-        print("destroy dice view" + arg0 + " " + arg0.transform.position);
         Destroy(arg0.gameObject);
     }
 

@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using UnityEngine;
 
 public class PlayerBattleState : IPlayerState
 {
@@ -20,7 +19,6 @@ public class PlayerBattleState : IPlayerState
 
     protected virtual void OnMoveDone()
     {
-        Debug.Log(_m.CombatState + "move doen");
     }
 
     public override void Update()

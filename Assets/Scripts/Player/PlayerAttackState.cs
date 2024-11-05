@@ -62,22 +62,15 @@ public class PlayerAttackState : PlayerBattleState
             var diceController = diceControllers.First();
             diceController.Shoot(_m.GetUsingEnemyPosition(), DiceMoveSpeed.Fast, () =>
             {
-                Debug.Log("Attack atk: " + diceController.GetDiceValue());
-                Debug.Log("Attack target: " + _m.GetEnemyDiceValue());
                 if (diceController.GetDiceValue() <= _m.GetEnemyDiceValue())
-                {
-                    Debug.Log("Attack failed");
                     diceController.Shoot(_m.GetFlyOutPosition(), DiceMoveSpeed.Fast,
                         () => { NextDice(diceController, diceControllers); });
-                }
                 else
-                {
                     diceController.Shoot(_m.GetEnemyPosition(), DiceMoveSpeed.Fast, () =>
                     {
-                        _m.CauseDamageToEnemy(Atk);
+                        _m.CauseDamageToEnemy(Atk + diceController.GetDiceValue());
                         NextDice(diceController, diceControllers);
                     });
-                }
             });
         }
     }

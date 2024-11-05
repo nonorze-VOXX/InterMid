@@ -24,6 +24,8 @@ internal enum TextIndex
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private Player playerPrefab;
+
+    [SerializeField] private TMP_Text welcomeText;
     // IGameFlow _gameFlow;
 
     private readonly HashSet<Player> playerPrepared = new();
@@ -35,6 +37,9 @@ public class GameManager : MonoBehaviour
     private int _turn;
 
     private TMP_Text _turnText;
+
+    private Player diePlayer;
+
     // private Player attacker;
     // private Player defender;
 
@@ -59,7 +64,6 @@ public class GameManager : MonoBehaviour
         {
             _gameState = value;
             _gameStateText.text = "Game State: " + _gameState;
-            Debug.Log("Game State: " + _gameState);
         }
     }
 
@@ -68,9 +72,14 @@ public class GameManager : MonoBehaviour
     {
         // _gameFlow = new GameFlow.Welcome();
         _gameStateText = GetComponentsInChildren<TMP_Text>()[(int)TextIndex.GameState];
+        _gameStateText.enabled = false;
         _turnText = GetComponentsInChildren<TMP_Text>()[(int)TextIndex.Turn];
         gameState = GameState.Welcome;
+        _turnText.enabled = false;
         _players = new Player[2];
+        welcomeText.text = "Press R to start";
+        welcomeText.enabled = true;
+        Random.InitState(42);
     }
 
     // Update is called once per frame
@@ -81,9 +90,9 @@ public class GameManager : MonoBehaviour
         switch (gameState)
         {
             case GameState.Welcome:
-                if (Input.GetKeyDown(KeyCode.S))
+                if (Input.GetKeyDown(KeyCode.R))
                 {
-                    Random.InitState(42);
+                    welcomeText.enabled = false;
                     var random_value = Random.Range(0, 6);
                     var p1First = random_value > 3;
                     _players = new[]
@@ -95,6 +104,7 @@ public class GameManager : MonoBehaviour
                     _players[0].AddListener(AddPlayerPrepared);
                     _players[1].AddListener(AddPlayerPrepared);
                     attacker = p1First ? _players[0] : _players[1];
+
                     OnDebugMode += attacker.SetDebug;
                     attacker.SetDebug(_gameStateText.enabled);
                     attacker.AddTurnAddOneListener(BattleEnd);
@@ -107,6 +117,8 @@ public class GameManager : MonoBehaviour
                     OnDebugMode += defender.SetDebug;
                     OnBeforeBattle += defender.ReceiveBeforeBattleSignal;
                     attacker.transform.position = new Vector3(-5, -2, 0);
+                    attacker.AddPlayerDieListener(OnPlayerDie);
+                    defender.AddPlayerDieListener(OnPlayerDie);
                     defender.transform.position = new Vector3(5, -2, 0);
                     var pos = defender.GetComponentInChildren<Slider>().transform.localPosition;
                     pos.x *= -1;
@@ -117,7 +129,11 @@ public class GameManager : MonoBehaviour
                     playerPrepared.Clear();
                     gameState = GameState.BeforeBattle;
                     OnBeforeBattle?.Invoke();
+                    attacker.transform.name = "Player1";
+                    defender.transform.name = "Player2";
+                    _turnText.enabled = true;
                     turn = 1;
+                    diePlayer = null;
                 }
 
                 break;
@@ -152,6 +168,38 @@ public class GameManager : MonoBehaviour
 
     private void BattleEnd()
     {
+        print("battle end");
+        if (diePlayer != null) return;
+
+        NextRound();
+
+        turn++;
+    }
+
+    private void OnPlayerDie(Player player)
+    {
+        diePlayer = player;
+        Debug.Log("Player Die");
+        player.enemy.score++;
+        if (player.enemy.score >= 2)
+        {
+            gameState = GameState.End;
+            welcomeText.text = "Player " + player.enemy.name + " Win!\n Press R to restart";
+            welcomeText.enabled = true;
+            print("Player " + player.enemy.name + " Win!");
+            print("destroy player");
+            Destroy(player.enemy.gameObject);
+            Destroy(player.gameObject);
+        }
+        else
+        {
+            NextRound();
+            turn = 1;
+        }
+    }
+
+    private void NextRound()
+    {
         gameState = GameState.BeforeBattle;
         foreach (var player in _players)
         {
@@ -159,8 +207,6 @@ public class GameManager : MonoBehaviour
             state = state == COMBAT_STATE.Attack ? COMBAT_STATE.Defend : COMBAT_STATE.Attack;
             player.NextTurn(state);
         }
-
-        turn++;
     }
 
 
@@ -172,18 +218,6 @@ public class GameManager : MonoBehaviour
         // componentInChildren.enabled = next;
         OnDebugMode?.Invoke(next);
     }
-
-    private void Judege(int p1, int p2)
-    {
-        if (p1 > p2)
-            Debug.Log("Player 1 win");
-        else if (p1 < p2)
-            Debug.Log("Player 2 win");
-        else
-            Debug.Log("Draw");
-        gameState = GameState.BattleAnimation;
-    }
-
 
     private void AddPlayerPrepared(Player player)
     {

@@ -20,7 +20,6 @@ public class PlayerDefendState : PlayerBattleState
 
     public override void OnExit()
     {
-        Debug.Log("defene exit");
     }
 
     public void AttackerShootDone()
