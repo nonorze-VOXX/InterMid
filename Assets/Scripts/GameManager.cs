@@ -26,7 +26,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Player playerPrefab;
 
     [SerializeField] private TMP_Text welcomeText;
-    // IGameFlow _gameFlow;
 
     private readonly HashSet<Player> playerPrepared = new();
     private GameState _gameState;
