@@ -9,7 +9,7 @@ using Random = UnityEngine.Random;
 internal enum GameState
 {
     Welcome,
-    BeforeBattle,
+    Prepare,
     Battle,
     End,
     BattleAnimation
@@ -134,7 +134,7 @@ public class GameManager : MonoBehaviour
                 {
                     welcomeText.enabled = false;
                     playerPrepared.Clear();
-                    gameState = GameState.BeforeBattle;
+                    gameState = GameState.Prepare;
                     OnBeforeBattle?.Invoke();
                     _turnText.enabled = true;
                     turn = 1;
@@ -143,7 +143,7 @@ public class GameManager : MonoBehaviour
                 }
 
                 break;
-            case GameState.BeforeBattle:
+            case GameState.Prepare:
                 break;
             case GameState.Battle:
                 // Debug.Log("Battleing");
@@ -203,7 +203,7 @@ public class GameManager : MonoBehaviour
 
     private void NextRound()
     {
-        gameState = GameState.BeforeBattle;
+        gameState = GameState.Prepare;
         foreach (var player in _players)
         {
             var state = player.GetCombatState();
@@ -227,7 +227,7 @@ public class GameManager : MonoBehaviour
         playerPrepared.Add(player);
         if (playerPrepared.Count == 2)
         {
-            if (gameState == GameState.BeforeBattle)
+            if (gameState == GameState.Prepare)
                 gameState = GameState.Battle;
             else if (gameState == GameState.Battle) gameState = GameState.End;
 
