@@ -33,9 +33,10 @@ public class GameManager : MonoBehaviour
     private Player[] _players = new Player[2];
 
     private int _turn;
+
     private TMP_Text _turnText;
-    private Player attacker;
-    private Player defender;
+    // private Player attacker;
+    // private Player defender;
 
     private UnityAction OnBeforeBattle;
 
@@ -89,6 +90,8 @@ public class GameManager : MonoBehaviour
                     {
                         Instantiate(playerPrefab), Instantiate(playerPrefab)
                     };
+                    Player attacker;
+                    Player defender;
                     _players[0].AddListener(AddPlayerPrepared);
                     _players[1].AddListener(AddPlayerPrepared);
                     attacker = p1First ? _players[0] : _players[1];
@@ -150,6 +153,13 @@ public class GameManager : MonoBehaviour
     private void BattleEnd()
     {
         gameState = GameState.BeforeBattle;
+        foreach (var player in _players)
+        {
+            var state = player.GetCombatState();
+            state = state == COMBAT_STATE.Attack ? COMBAT_STATE.Defend : COMBAT_STATE.Attack;
+            player.NextTurn(state);
+        }
+
         turn++;
     }
 

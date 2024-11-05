@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public enum CombatState
+public enum COMBAT_STATE
 {
     Defend,
     Attack,
@@ -25,10 +25,10 @@ public class PlayerMachine
     public PlayerMachine(Player player)
     {
         _player = player;
-        CombatState = CombatState.NotAssigned;
+        CombatState = COMBAT_STATE.NotAssigned;
     }
 
-    public CombatState CombatState { get; set; }
+    public COMBAT_STATE CombatState { get; set; }
 
     public List<DiceController> Dices { get; } = new();
 
@@ -69,7 +69,7 @@ public class PlayerMachine
             var diceView = diceViews[i];
             var image = diceView.GetComponentInChildren<SpriteRenderer>();
 
-            var colorHex = CombatState == CombatState.Attack ? "#933E3E" : "#578DD4";
+            var colorHex = CombatState == COMBAT_STATE.Attack ? "#933E3E" : "#578DD4";
 
             if (ColorUtility.TryParseHtmlString(colorHex, out var newColor))
                 image.color = newColor;
@@ -96,12 +96,12 @@ public class PlayerMachine
 
     public void ToBattleState()
     {
-        if (CombatState == CombatState.Attack)
+        if (CombatState == COMBAT_STATE.Attack)
         {
             playerAttackState = new PlayerAttackState(this, _player.Atk);
             State = playerAttackState;
         }
-        else if (CombatState == CombatState.Defend)
+        else if (CombatState == COMBAT_STATE.Defend)
         {
             playerDefendState = new PlayerDefendState(this);
             State = playerDefendState;
@@ -175,13 +175,11 @@ public class PlayerMachine
     public void AttackerRunOutDice()
     {
         _player.TurnEnd();
-        _player.enemy.NextTurn();
-        NextTurn();
     }
 
-    public void NextTurn()
+    public void NextTurn(COMBAT_STATE nextCombatState)
     {
-        CombatState = CombatState == CombatState.Attack ? CombatState.Defend : CombatState.Attack;
+        CombatState = nextCombatState;
         ToThrowState();
     }
 }

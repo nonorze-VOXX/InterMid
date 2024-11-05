@@ -9,7 +9,6 @@ public class Player : MonoBehaviour
 {
     public static float DiceDistance = 1.5f;
     public static int fullHp = 100;
-    [SerializeField] private PlayerMachine _playerMachine;
 
     [SerializeField] private GameObject _DiceViewPrefab;
     public Player enemy;
@@ -18,6 +17,7 @@ public class Player : MonoBehaviour
 
 
     private readonly List<DiceView> _diceViews = new();
+    [SerializeField] private PlayerMachine _playerMachine;
     private TMP_Text _stateText;
     private Slider hpSlider;
     private bool isBeforeBattleSignal;
@@ -120,12 +120,12 @@ public class Player : MonoBehaviour
 
     public void SetAttacker()
     {
-        _playerMachine.CombatState = CombatState.Attack;
+        _playerMachine.CombatState = COMBAT_STATE.Attack;
     }
 
     public void SetDefender()
     {
-        _playerMachine.CombatState = CombatState.Defend;
+        _playerMachine.CombatState = COMBAT_STATE.Defend;
     }
 
     public Vector2 GetDiceUsingPosition()
@@ -176,9 +176,9 @@ public class Player : MonoBehaviour
         _playerMachine.DefenderGetAttackerShootDone();
     }
 
-    public void NextTurn()
+    public void NextTurn(COMBAT_STATE nextState)
     {
-        _playerMachine.NextTurn();
+        _playerMachine.NextTurn(nextState);
     }
 
     public void AddTurnAddOneListener(UnityAction action)
@@ -189,5 +189,10 @@ public class Player : MonoBehaviour
     public void TurnEnd()
     {
         OnTurnAddOne?.Invoke();
+    }
+
+    public COMBAT_STATE GetCombatState()
+    {
+        return _playerMachine.CombatState;
     }
 }
