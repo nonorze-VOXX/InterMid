@@ -65,7 +65,7 @@ namespace remake
                     diceSpeed = 5;
                     break;
                 case DiceMoveSpeed.Fast:
-                    diceSpeed = 20;
+                    diceSpeed = 50;
                     break;
             }
         }

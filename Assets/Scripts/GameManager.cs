@@ -18,7 +18,8 @@ internal enum GameState
 internal enum TextIndex
 {
     GameState,
-    Turn
+    Turn,
+    Round
 }
 
 public class GameManager : MonoBehaviour

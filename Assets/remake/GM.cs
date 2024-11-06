@@ -8,8 +8,9 @@ namespace remake
     internal enum flow
     {
         Welcome,
-        Prepare,
-        BeforeBattle,
+        RoundStart,
+        Prepare, // turn start
+        BeforeBattle, // one dice start
         Battle,
         End
     }
@@ -26,6 +27,7 @@ namespace remake
         [SerializeField] private TMP_Text welcomeText;
         [SerializeField] private TMP_Text turnText;
         [SerializeField] private TMP_Text flowText;
+        [SerializeField] private TMP_Text roundText;
 
         private flow _state;
 
@@ -34,6 +36,7 @@ namespace remake
 
         private bool prepareOk;
         private int shootCount;
+        private rPlayer winner;
 
         private int turn
         {
@@ -54,9 +57,11 @@ namespace remake
                 // like on exit
                 switch (_state)
                 {
-                    case flow.Welcome:
+                    case flow.Welcome: // Game Start
                         welcomeText.gameObject.SetActive(false);
-                        turnText.enabled = true;
+                        break;
+                    case flow.RoundStart:
+                        roundText.enabled = false;
                         break;
                     case flow.Prepare:
                         break;
@@ -65,10 +70,14 @@ namespace remake
                     case flow.Battle:
                         break;
                     case flow.End:
+                        winner = null;
                         break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
+
+                _state = value;
+
 
                 // like on enter
                 switch (value)
@@ -78,10 +87,19 @@ namespace remake
                         // make text show "press any key to start"
                         welcomeText.gameObject.SetActive(true);
                         welcomeText.text = "press r key to start";
+                        turnText.enabled = false;
                         if (turnText) turnText.enabled = false;
+                        break;
+                    case flow.RoundStart:
+                        foreach (var rPlayer in players) rPlayer.NewRound();
                         turn = 0;
+                        roundText.enabled = true;
+                        turnText.enabled = false;
+                        players[0].gameObject.SetActive(true);
+                        players[1].gameObject.SetActive(true);
                         break;
                     case flow.Prepare:
+                        turnText.enabled = true;
                         turn++;
                         if (turn > max_turn)
                         {
@@ -89,8 +107,6 @@ namespace remake
                         }
                         else
                         {
-                            players[0].gameObject.SetActive(true);
-                            players[1].gameObject.SetActive(true);
                             players[0].ResetThrowCount();
                             players[1].ResetThrowCount();
                             players[0].Prepare(OnPrepareDone);
@@ -110,8 +126,6 @@ namespace remake
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
-
-                _state = value;
             }
         }
 
@@ -123,6 +137,9 @@ namespace remake
             flowText.enabled = false;
             turnText = GetComponentsInChildren<TMP_Text>()[(int)TextIndex.Turn];
             turnText.enabled = false;
+            roundText = GetComponentsInChildren<TMP_Text>()[(int)TextIndex.Round];
+            roundText.text = "Press R to Start round";
+            roundText.enabled = false;
 
             #endregion
 
@@ -171,17 +188,25 @@ namespace remake
             switch (state)
             {
                 case flow.Welcome:
+                    if (Input.GetKeyDown(KeyCode.R)) state = flow.RoundStart;
+                    break;
+                case flow.RoundStart:
                     if (Input.GetKeyDown(KeyCode.R)) state = flow.Prepare;
 
                     break;
                 case flow.Prepare:
 
                     if (turn > max_turn)
-                    {
                         // todo: round end , judge winner
+                    {
+                        state = flow.RoundStart;
+                        roundText.text = "no one get a score\n Press R to next round";
+                    }
+                    else if (prepareOk)
+                    {
+                        state = flow.BeforeBattle;
                     }
 
-                    if (prepareOk) state = flow.BeforeBattle;
                     break;
                 case flow.BeforeBattle:
                     state = flow.Battle;
@@ -190,6 +215,7 @@ namespace remake
 
                     break;
                 case flow.End:
+                    if (Input.GetKeyDown(KeyCode.R)) state = flow.Welcome;
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -214,18 +240,35 @@ namespace remake
             players[1].UsedDice();
             if (players[0].Hp <= 0)
             {
-                if (players[1].score >= 2) state = flow.End;
-                else state = flow.BeforeBattle;
+                if (players[1].score >= 2)
+                {
+                    state = flow.End;
+                }
+                else
+                {
+                    players[1].score++;
+                    state = flow.RoundStart;
+                    roundText.text = "Player 2 get a score\n Press R to next";
+                }
                 // next turn
             }
             else if (players[1].Hp <= 0)
             {
-                if (players[0].score >= 2) state = flow.End;
-                else state = flow.BeforeBattle;
+                if (players[0].score >= 2)
+                {
+                    state = flow.End;
+                }
+                else
+                {
+                    players[0].score++;
+                    state = flow.RoundStart;
+                    roundText.text = "Player 1 get a score\n Press R to next";
+                }
                 // next turn
             }
             else if (shootCount >= rPlayer.maxDiceCount)
             {
+                // sus
                 shootCount = 0;
                 state = flow.Prepare;
             }

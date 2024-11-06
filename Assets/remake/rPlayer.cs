@@ -10,14 +10,24 @@ namespace remake
     {
         public static float DiceDistance = 1.5f;
         public static int fullHp = 100;
-        public int score;
         private readonly int Atk = 1;
         private readonly List<rDice> dices = new();
         private int _hp;
+        private int _score;
         private Slider hpSlider;
 
         private bool is_attacking;
         private rPlayer opponent;
+
+        public int score
+        {
+            get => _score;
+            set
+            {
+                GetComponentInChildren<TMP_Text>().text = "Score: " + value;
+                _score = value;
+            }
+        }
 
         public int Hp
         {
@@ -32,6 +42,7 @@ namespace remake
         private void Awake()
         {
             hpSlider = GetComponentInChildren<Slider>();
+            GetComponentInChildren<TMP_Text>().enabled = true;
 
             Hp = fullHp;
             score = 0;
@@ -124,10 +135,12 @@ namespace remake
                 ;
         }
 
-        public void SetDebugText(bool nextDebugMode)
+
+        public void NewRound()
         {
-            var componentInChildren = GetComponentInChildren<TMP_Text>();
-            componentInChildren.enabled = nextDebugMode;
+            foreach (var dice in dices) Destroy(dice.gameObject);
+            dices.Clear();
+            Hp = fullHp;
         }
 
         #region throw_dice
