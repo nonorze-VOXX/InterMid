@@ -15,11 +15,16 @@ namespace remake
         End
     }
 
+    internal enum ButtonIndex
+    {
+        TurnAddOne
+    }
+
     public class GM : MonoBehaviour
     {
         private static readonly int PLAYER_COUNT = 2;
 
-        private static readonly int max_turn = 5; // todo: change to 10
+        private static readonly int max_turn = 10;
         // todo: speed running for deadline 
 
         [SerializeField] private rPlayer playerPrefab;
@@ -28,6 +33,7 @@ namespace remake
         [SerializeField] private TMP_Text turnText;
         [SerializeField] private TMP_Text flowText;
         [SerializeField] private TMP_Text roundText;
+        [SerializeField] private Button turnAddOneButton;
 
         private flow _state;
 
@@ -141,6 +147,9 @@ namespace remake
             roundText.text = "Press R to Start round";
             roundText.enabled = false;
 
+            turnAddOneButton = GetComponentsInChildren<Button>()[(int)ButtonIndex.TurnAddOne];
+            turnAddOneButton.onClick.AddListener(() => turn++);
+
             #endregion
 
             players = new rPlayer[PLAYER_COUNT];
@@ -225,6 +234,7 @@ namespace remake
         private void ChangeDebugMode(bool nextDebugMode)
         {
             flowText.enabled = nextDebugMode;
+            turnAddOneButton.gameObject.SetActive(nextDebugMode);
             // foreach (var rPlayer in players) rPlayer.SetDebugText(nextDebugMode);
         }
 
