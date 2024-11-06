@@ -95,12 +95,13 @@ namespace remake
                     #region Atk
 
                     {
-                        var pattern = @"(Atk)([+*])(\d+)";
+                        var pattern = @"(Atk)([+*])(\d+)(\.)(\d+)";
                         var match = Regex.Match(value, pattern);
                         if (match.Success)
                         {
                             var op = match.Groups[2].Value;
-                            var num = int.Parse(match.Groups[3].Value);
+                            var num = float.Parse(match.Groups[3].Value + match.Groups[4].Value +
+                                                  match.Groups[5].Value);
                             switch (op)
                             {
                                 case "+":

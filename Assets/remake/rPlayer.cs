@@ -194,12 +194,12 @@ namespace remake
             isAttacking = !isAttacking;
         }
 
-        public void AddAttack(int i)
+        public void AddAttack(float i)
         {
             Atk += i;
         }
 
-        public void MultiplyAttack(int num)
+        public void MultiplyAttack(float num)
         {
             Atk *= num;
         }
