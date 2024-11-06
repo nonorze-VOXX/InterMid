@@ -154,6 +154,17 @@ namespace remake
             is_attacking = !is_attacking;
         }
 
+        #region debug
+
+        private bool nextTriple;
+
+        public void NextThrowTripleDice()
+        {
+            nextTriple = true;
+        }
+
+        #endregion
+
         #region throw_dice
 
         public const int maxDiceCount = 3;
@@ -166,18 +177,102 @@ namespace remake
             throwCount = 0;
         }
 
+        private static void CheckDiceIsTriple(List<rDice> dices, UnityAction onPrepared)
+        {
+            if (dices.Count != 3) return;
+            // check all value is same
+            if (dices[0].GetValue() == dices[1].GetValue() && dices[1].GetValue() == dices[2].GetValue())
+                // set dice type to triple
+            {
+                foreach (var dice in dices)
+                    dice.SetDiceType(DiceType.Triple);
+                dices[1].Shoot(dices[0].transform.position, DiceMoveSpeed.Normal, () =>
+                {
+                    dices[0].Add(dices[1]);
+                    dices[1].gameObject.SetActive(false);
+                    dices[2].Shoot(dices[0].transform.position, DiceMoveSpeed.Normal, () =>
+                    {
+                        dices[0].Add(dices[2]);
+                        dices[2].gameObject.SetActive(false);
+                        var t = dices[2];
+                        dices.RemoveAt(2);
+                        Destroy(t);
+                        t = dices[1];
+                        dices.RemoveAt(1);
+                        Destroy(t);
+                        onPrepared?.Invoke();
+                    });
+                });
+            }
+        }
+
+        private void MergeDice(UnityAction onPrepared)
+        {
+            checkCount = 0;
+            CheckDiceIsTriple(dices, OnCheckDone(onPrepared));
+            CheckDiceIsPair(dices, OnCheckDone(onPrepared));
+            MergeAnimation(onPrepared);
+        }
+
+        private int checkCount;
+
+        private UnityAction OnCheckDone(UnityAction onPrepared)
+        {
+            return () =>
+            {
+                checkCount++;
+                if (checkCount == 2) onPrepared?.Invoke();
+            };
+        }
+
+        private void MergeAnimation(UnityAction onPrepared)
+        {
+            onPrepared?.Invoke();
+        }
+
+        private void CheckDiceIsPair(List<rDice> rDiceList, UnityAction onPrepared)
+        {
+            onPrepared?.Invoke();
+            return;
+            if (rDiceList[0].GetValue() == rDiceList[1].GetValue() &&
+                rDiceList[0].GetDiceType() == DiceType.Single
+                && rDiceList[1].GetDiceType() == DiceType.Single)
+            {
+                rDiceList[0].SetDiceType(DiceType.Pair);
+                rDiceList[1].SetDiceType(DiceType.Pair);
+            }
+            else if (rDiceList[1].GetValue() == rDiceList[2].GetValue()
+                     && rDiceList[1].GetDiceType() == DiceType.Single
+                     && rDiceList[2].GetDiceType() == DiceType.Single)
+            {
+                rDiceList[1].SetDiceType(DiceType.Pair);
+                rDiceList[2].SetDiceType(DiceType.Pair);
+            }
+            else if (rDiceList[0].GetValue() == rDiceList[2].GetValue()
+                     && rDiceList[0].GetDiceType() == DiceType.Single
+                     && rDiceList[2].GetDiceType() == DiceType.Single)
+            {
+                rDiceList[0].SetDiceType(DiceType.Pair);
+                rDiceList[2].SetDiceType(DiceType.Pair);
+            }
+        }
+
         public void Prepare(UnityAction onPrepared)
         {
             if (throwCount >= maxDiceCount)
             {
-                onPrepared?.Invoke();
+                nextTriple = false;
+                // onPrepared?.Invoke();
+                MergeDice(onPrepared);
                 return;
             }
 
-            throwCount++;
             var dice = Instantiate(dicePrefab);
             var transformPosition = transform.position + new Vector3(0, DiceDistance * (1 + throwCount));
             dice.transform.position = transformPosition;
+
+            var sameBefore = nextTriple && throwCount != 0;
+            throwCount++;
 
             var image = dice.GetComponentInChildren<SpriteRenderer>();
 
@@ -188,7 +283,11 @@ namespace remake
             else
                 Debug.LogError("Invalid color code.");
             dices.Add(dice);
-            dice.Roll(OnRollEnd(onPrepared));
+            dice.Roll(() =>
+            {
+                if (sameBefore) dice.SetValue(dices[0].GetValue());
+                OnRollEnd(onPrepared)?.Invoke();
+            });
         }
 
         private UnityAction OnRollEnd(UnityAction unityAction)

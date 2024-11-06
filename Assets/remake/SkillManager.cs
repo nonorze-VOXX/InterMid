@@ -1,6 +1,6 @@
 ﻿namespace remake
 {
-    public class SkillReader
+    public class SkillManager
     {
         public static void ReadSkill()
         {

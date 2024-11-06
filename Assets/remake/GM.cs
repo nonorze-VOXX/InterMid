@@ -24,7 +24,8 @@ namespace remake
 
     internal enum ButtonIndex
     {
-        TurnAddOne
+        TurnAddOne,
+        P1Triple
     }
 
     public class GM : MonoBehaviour
@@ -41,6 +42,7 @@ namespace remake
         [SerializeField] private TMP_Text flowText;
         [SerializeField] private TMP_Text roundText;
         [SerializeField] private Button turnAddOneButton;
+        [SerializeField] private Button p1TripleButton;
 
         private flow _state;
 
@@ -156,8 +158,18 @@ namespace remake
             roundText.text = "Press R to Start round";
             roundText.enabled = false;
 
+            #endregion
+
+            #region get_button_object
+
             turnAddOneButton = GetComponentsInChildren<Button>()[(int)ButtonIndex.TurnAddOne];
             turnAddOneButton.onClick.AddListener(() => turn++);
+            p1TripleButton = GetComponentsInChildren<Button>()[(int)ButtonIndex.P1Triple];
+            p1TripleButton.onClick.AddListener(() =>
+            {
+                if (players.Length > 0)
+                    players[0].NextThrowTripleDice();
+            });
 
             #endregion
 
@@ -244,6 +256,7 @@ namespace remake
         {
             flowText.enabled = nextDebugMode;
             turnAddOneButton.gameObject.SetActive(nextDebugMode);
+            p1TripleButton.gameObject.SetActive(nextDebugMode);
             // foreach (var rPlayer in players) rPlayer.SetDebugText(nextDebugMode);
         }
 

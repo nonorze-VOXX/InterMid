@@ -5,9 +5,17 @@ using UnityEngine.Events;
 
 namespace remake
 {
+    public enum DiceType
+    {
+        Single,
+        Pair,
+        Triple
+    }
+
     public class rDice : MonoBehaviour
     {
         public float diceSpeed = 5;
+        private DiceType _diceType;
         private TMP_Text _text;
         private int _value;
         private bool moveable;
@@ -27,6 +35,7 @@ namespace remake
         private void Awake()
         {
             _text = GetComponentInChildren<TMP_Text>();
+            _diceType = DiceType.Single;
         }
 
         private void Update()
@@ -109,6 +118,26 @@ namespace remake
             }
 
             onRollEnd?.Invoke();
+        }
+
+        public void SetDiceType(DiceType newType)
+        {
+            _diceType = newType;
+        }
+
+        public DiceType GetDiceType()
+        {
+            return _diceType;
+        }
+
+        public void Add(rDice dice)
+        {
+            value += dice.GetValue();
+        }
+
+        public void SetValue(int value)
+        {
+            this.value = value;
         }
     }
 }
