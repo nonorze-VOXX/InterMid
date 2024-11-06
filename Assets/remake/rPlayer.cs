@@ -13,27 +13,45 @@ namespace remake
         Fast
     }
 
+    internal enum PlayerText
+    {
+        Score,
+        Atk
+    }
+
     public class rPlayer : MonoBehaviour
     {
         public static float DiceDistance = 1.5f;
         public static int fullHp = 100;
         public static float initAtk = 1;
+        [SerializeField] private TMP_Text scoreText;
+        [SerializeField] private TMP_Text atkText;
         private readonly List<rDice> dices = new();
+        private float _atk = 1;
         private int _hp;
         private int _score;
-        private float Atk = 1;
         private Slider hpSlider;
 
         private bool isAttacking;
         private rPlayer opponent;
+
+        private float Atk
+        {
+            get => _atk;
+            set
+            {
+                _atk = value;
+                atkText.text = "Atk: " + value;
+            }
+        }
 
         public int score
         {
             get => _score;
             set
             {
-                GetComponentInChildren<TMP_Text>().text = "Score: " + value;
                 _score = value;
+                scoreText.text = "Score: " + value;
             }
         }
 
@@ -51,6 +69,14 @@ namespace remake
         {
             hpSlider = GetComponentInChildren<Slider>();
             GetComponentInChildren<TMP_Text>().enabled = true;
+
+            #region GetText
+
+            var texts = GetComponentsInChildren<TMP_Text>();
+            atkText = texts[(int)PlayerText.Atk];
+            scoreText = texts[(int)PlayerText.Score];
+
+            #endregion
 
             Hp = fullHp;
             Atk = initAtk;
@@ -181,6 +207,7 @@ namespace remake
         public void AddHp(int num)
         {
             Hp += num;
+            Hp = Mathf.Min(Hp, fullHp);
             EffectManager.Instance.CreateGreenText("Hp + " + num, transform.position);
         }
 

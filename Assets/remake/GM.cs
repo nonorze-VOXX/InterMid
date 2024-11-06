@@ -21,7 +21,8 @@ namespace remake
     {
         GameState,
         Turn,
-        Round
+        Round,
+        RoundCount
     }
 
     internal enum ButtonIndex
@@ -43,12 +44,14 @@ namespace remake
         [SerializeField] private TMP_Text turnText;
         [SerializeField] private TMP_Text flowText;
         [SerializeField] private TMP_Text roundText;
+        [SerializeField] private TMP_Text roundCountText;
         [SerializeField] private Button turnAddOneButton;
         [SerializeField] private Button p1TripleButton;
 
         private readonly HashSet<rPlayer> preparedPlayer = new();
 
         private readonly HashSet<rPlayer> turnEndPlayer = new();
+        private int _round;
 
         private flow _state;
 
@@ -58,6 +61,16 @@ namespace remake
         private bool prepareOk;
         private int shootCount;
         private rPlayer winner;
+
+        private int round
+        {
+            get => _round;
+            set
+            {
+                _round = value;
+                roundCountText.text = "Round: " + round;
+            }
+        }
 
         private int turn
         {
@@ -113,6 +126,7 @@ namespace remake
                         if (turnText) turnText.enabled = false;
                         break;
                     case flow.RoundStart:
+                        round++;
                         turn = 0;
                         roundText.enabled = true;
                         turnText.enabled = false;
@@ -167,6 +181,9 @@ namespace remake
             turnText.enabled = false;
             roundText = GetComponentsInChildren<TMP_Text>()[(int)TextIndex.Round];
             roundText.text = "Press R to Start round";
+
+            roundCountText = GetComponentsInChildren<TMP_Text>()[(int)TextIndex.RoundCount];
+            round = 0;
             roundText.enabled = false;
 
             #endregion
