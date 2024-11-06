@@ -164,7 +164,7 @@ namespace remake
             players[0].gameObject.SetActive(false);
             players[1].gameObject.SetActive(false);
 
-            players[1].GetComponentInChildren<Image>().transform.localRotation = Quaternion.Euler(0, 180, 0);
+            players[1].GetComponentInChildren<SpriteRenderer>().flipX = true;
             var pos = players[1].GetComponentInChildren<Slider>().transform.localPosition;
             pos.x *= -1;
             players[1].GetComponentInChildren<Slider>().transform.localPosition = pos;

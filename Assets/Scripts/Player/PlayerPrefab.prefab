@@ -393,7 +393,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  m_Sprite: {fileID: 425872569, guid: 2246a6cae32d5504e86923cff7f5a944, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -646,6 +646,7 @@ MonoBehaviour:
   _DiceViewPrefab: {fileID: 3232304007609714820, guid: 05c2241ee760dae49b12087d8c7d8e3c, type: 3}
   enemy: {fileID: 0}
   _hp: 0
+  _score: 0
 --- !u!1 &6517209320649690350
 GameObject:
   m_ObjectHideFlags: 0
