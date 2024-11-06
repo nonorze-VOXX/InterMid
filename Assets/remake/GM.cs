@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace remake
@@ -43,6 +45,10 @@ namespace remake
         [SerializeField] private TMP_Text roundText;
         [SerializeField] private Button turnAddOneButton;
         [SerializeField] private Button p1TripleButton;
+
+        private readonly HashSet<rPlayer> preparedPlayer = new();
+
+        private readonly HashSet<rPlayer> turnEndPlayer = new();
 
         private flow _state;
 
@@ -114,6 +120,7 @@ namespace remake
                         players[1].gameObject.SetActive(true);
                         break;
                     case flow.Prepare:
+                        shootCount = 0;
                         turnText.enabled = true;
                         turn++;
                         if (turn > max_turn)
@@ -126,8 +133,9 @@ namespace remake
                             players[1].ChangeAttack();
                             players[0].ResetThrowCount();
                             players[1].ResetThrowCount();
-                            players[0].Prepare(OnPrepareDone);
-                            players[1].Prepare(OnPrepareDone);
+                            preparedPlayer.Clear();
+                            players[0].Prepare(OnPrepareDone(players[0]));
+                            players[1].Prepare(OnPrepareDone(players[1]));
                             prepareOk = false;
                         }
 
@@ -135,8 +143,9 @@ namespace remake
                     case flow.BeforeBattle:
                         break;
                     case flow.Battle:
-                        players[0].Turn(OnOneShootEnd);
-                        players[1].Turn(OnOneShootEnd);
+                        turnEndPlayer.Clear();
+                        players[0].Turn(OnOneShootEnd(players[0]));
+                        players[1].Turn(OnOneShootEnd(players[1]));
                         break;
                     case flow.End:
                         break;
@@ -260,54 +269,64 @@ namespace remake
             // foreach (var rPlayer in players) rPlayer.SetDebugText(nextDebugMode);
         }
 
-        private void OnPrepareDone()
+        private UnityAction OnPrepareDone(rPlayer rPlayer)
         {
-            prepareOk = true;
+            return
+                () =>
+                {
+                    preparedPlayer.Add(rPlayer);
+                    if (preparedPlayer.Count < 2) return;
+                    prepareOk = true;
+                };
         }
 
-        private void OnOneShootEnd()
+        private UnityAction OnOneShootEnd(rPlayer player)
         {
-            shootCount++;
-            players[0].UsedDice();
-            players[1].UsedDice();
-            if (players[0].Hp <= 0)
+            return () =>
             {
-                if (players[1].score >= 2)
+                turnEndPlayer.Add(player);
+                if (turnEndPlayer.Count < 2) return;
+                shootCount++;
+                players[0].UsedDice();
+                players[1].UsedDice();
+                if (players[0].Hp <= 0)
                 {
-                    state = flow.End;
+                    if (players[1].score >= 2)
+                    {
+                        state = flow.End;
+                    }
+                    else
+                    {
+                        players[1].score++;
+                        state = flow.RoundStart;
+                        roundText.text = "Player 2 get a score\n Press R to next";
+                    }
+                    // next turn
+                }
+                else if (players[1].Hp <= 0)
+                {
+                    if (players[0].score >= 2)
+                    {
+                        state = flow.End;
+                    }
+                    else
+                    {
+                        players[0].score++;
+                        state = flow.RoundStart;
+                        roundText.text = "Player 1 get a score\n Press R to next";
+                    }
+                    // next turn
+                }
+                else if (shootCount >= rPlayer.maxDiceCount)
+                {
+                    // sus
+                    state = flow.Prepare;
                 }
                 else
                 {
-                    players[1].score++;
-                    state = flow.RoundStart;
-                    roundText.text = "Player 2 get a score\n Press R to next";
+                    state = flow.BeforeBattle;
                 }
-                // next turn
-            }
-            else if (players[1].Hp <= 0)
-            {
-                if (players[0].score >= 2)
-                {
-                    state = flow.End;
-                }
-                else
-                {
-                    players[0].score++;
-                    state = flow.RoundStart;
-                    roundText.text = "Player 1 get a score\n Press R to next";
-                }
-                // next turn
-            }
-            else if (shootCount >= rPlayer.maxDiceCount)
-            {
-                // sus
-                shootCount = 0;
-                state = flow.Prepare;
-            }
-            else
-            {
-                state = flow.BeforeBattle;
-            }
+            };
         }
     }
 }

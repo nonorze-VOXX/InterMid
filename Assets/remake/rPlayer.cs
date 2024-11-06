@@ -76,6 +76,7 @@ namespace remake
             var dice = GetDice();
             if (!dice)
             {
+                print(transform.name + " run out of dice");
                 OnTurnEnd?.Invoke();
                 return;
             }
@@ -96,7 +97,7 @@ namespace remake
                     }
                 );
             else
-                dice.Shoot(GetUseDicePos(), DiceMoveSpeed.Fast, () => { });
+                dice.Shoot(GetUseDicePos(), DiceMoveSpeed.Fast, () => { OnTurnEnd?.Invoke(); });
         }
 
 
@@ -186,14 +187,10 @@ namespace remake
             {
                 foreach (var dice in dices)
                     dice.SetDiceType(DiceType.Triple);
-                dices[1].Shoot(dices[0].transform.position, DiceMoveSpeed.Normal, () =>
+                dices[1].MergeTo(dices[0], () =>
                 {
-                    dices[0].Add(dices[1]);
-                    dices[1].gameObject.SetActive(false);
-                    dices[2].Shoot(dices[0].transform.position, DiceMoveSpeed.Normal, () =>
+                    dices[2].MergeTo(dices[0], () =>
                     {
-                        dices[0].Add(dices[2]);
-                        dices[2].gameObject.SetActive(false);
                         var t = dices[2];
                         dices.RemoveAt(2);
                         Destroy(t);
@@ -204,6 +201,10 @@ namespace remake
                     });
                 });
             }
+            else
+            {
+                onPrepared?.Invoke();
+            }
         }
 
         private void MergeDice(UnityAction onPrepared)
@@ -211,7 +212,6 @@ namespace remake
             checkCount = 0;
             CheckDiceIsTriple(dices, OnCheckDone(onPrepared));
             CheckDiceIsPair(dices, OnCheckDone(onPrepared));
-            MergeAnimation(onPrepared);
         }
 
         private int checkCount;
@@ -223,11 +223,6 @@ namespace remake
                 checkCount++;
                 if (checkCount == 2) onPrepared?.Invoke();
             };
-        }
-
-        private void MergeAnimation(UnityAction onPrepared)
-        {
-            onPrepared?.Invoke();
         }
 
         private void CheckDiceIsPair(List<rDice> rDiceList, UnityAction onPrepared)

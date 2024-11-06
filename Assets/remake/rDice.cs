@@ -74,7 +74,7 @@ namespace remake
                     diceSpeed = 5;
                     break;
                 case DiceMoveSpeed.Fast:
-                    diceSpeed = 50;
+                    diceSpeed = 20;
                     break;
             }
         }
@@ -138,6 +138,16 @@ namespace remake
         public void SetValue(int value)
         {
             this.value = value;
+        }
+
+        public void MergeTo(rDice dice, UnityAction action)
+        {
+            Shoot(dice.transform.position, DiceMoveSpeed.Normal, () =>
+            {
+                dice.Add(this);
+                gameObject.SetActive(false);
+                action?.Invoke();
+            });
         }
     }
 }
