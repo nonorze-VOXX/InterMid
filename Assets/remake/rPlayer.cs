@@ -225,30 +225,52 @@ namespace remake
             };
         }
 
-        private void CheckDiceIsPair(List<rDice> rDiceList, UnityAction onPrepared)
+        private void CheckDiceIsPair(List<rDice> dices, UnityAction onPrepared)
         {
-            onPrepared?.Invoke();
-            return;
-            if (rDiceList[0].GetValue() == rDiceList[1].GetValue() &&
-                rDiceList[0].GetDiceType() == DiceType.Single
-                && rDiceList[1].GetDiceType() == DiceType.Single)
+            // onPrepared?.Invoke();
+            // return;
+            if (dices[0].GetValue() == dices[1].GetValue() &&
+                dices[0].GetDiceType() == DiceType.Single
+                && dices[1].GetDiceType() == DiceType.Single)
             {
-                rDiceList[0].SetDiceType(DiceType.Pair);
-                rDiceList[1].SetDiceType(DiceType.Pair);
+                dices[0].SetDiceType(DiceType.Pair);
+                dices[1].MergeTo(dices[0], () =>
+                {
+                    var t = dices[1];
+                    dices.RemoveAt(1);
+                    Destroy(t);
+                    onPrepared?.Invoke();
+                });
             }
-            else if (rDiceList[1].GetValue() == rDiceList[2].GetValue()
-                     && rDiceList[1].GetDiceType() == DiceType.Single
-                     && rDiceList[2].GetDiceType() == DiceType.Single)
+            else if (dices[1].GetValue() == dices[2].GetValue()
+                     && dices[1].GetDiceType() == DiceType.Single
+                     && dices[2].GetDiceType() == DiceType.Single)
             {
-                rDiceList[1].SetDiceType(DiceType.Pair);
-                rDiceList[2].SetDiceType(DiceType.Pair);
+                dices[1].SetDiceType(DiceType.Pair);
+                dices[2].MergeTo(dices[1], () =>
+                {
+                    var t = dices[2];
+                    dices.RemoveAt(2);
+                    Destroy(t);
+                    onPrepared?.Invoke();
+                });
             }
-            else if (rDiceList[0].GetValue() == rDiceList[2].GetValue()
-                     && rDiceList[0].GetDiceType() == DiceType.Single
-                     && rDiceList[2].GetDiceType() == DiceType.Single)
+            else if (dices[0].GetValue() == dices[2].GetValue()
+                     && dices[0].GetDiceType() == DiceType.Single
+                     && dices[2].GetDiceType() == DiceType.Single)
             {
-                rDiceList[0].SetDiceType(DiceType.Pair);
-                rDiceList[2].SetDiceType(DiceType.Pair);
+                dices[0].SetDiceType(DiceType.Pair);
+                dices[2].MergeTo(dices[0], () =>
+                {
+                    var t = dices[2];
+                    dices.RemoveAt(2);
+                    Destroy(t);
+                    onPrepared?.Invoke();
+                });
+            }
+            else
+            {
+                onPrepared?.Invoke();
             }
         }
 

@@ -83,6 +83,7 @@ namespace remake
                         break;
                     case flow.RoundStart:
                         roundText.enabled = false;
+                        foreach (var rPlayer in players) rPlayer.NewRound();
                         break;
                     case flow.Prepare:
                         break;
@@ -112,7 +113,6 @@ namespace remake
                         if (turnText) turnText.enabled = false;
                         break;
                     case flow.RoundStart:
-                        foreach (var rPlayer in players) rPlayer.NewRound();
                         turn = 0;
                         roundText.enabled = true;
                         turnText.enabled = false;
