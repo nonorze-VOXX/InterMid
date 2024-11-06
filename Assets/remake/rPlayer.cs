@@ -149,6 +149,11 @@ namespace remake
             Hp = fullHp;
         }
 
+        public void ChangeAttack()
+        {
+            is_attacking = !is_attacking;
+        }
+
         #region throw_dice
 
         public const int maxDiceCount = 3;

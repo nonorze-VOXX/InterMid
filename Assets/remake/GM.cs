@@ -120,6 +120,8 @@ namespace remake
                         }
                         else
                         {
+                            players[0].ChangeAttack();
+                            players[1].ChangeAttack();
                             players[0].ResetThrowCount();
                             players[1].ResetThrowCount();
                             players[0].Prepare(OnPrepareDone);
