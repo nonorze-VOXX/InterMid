@@ -165,6 +165,7 @@ namespace remake
 
         public void AddFunction(UnityAction<rPlayer, rDice> skillItem2)
         {
+            print("get skill " + skillItem2);
             diceSkills += skillItem2;
         }
 

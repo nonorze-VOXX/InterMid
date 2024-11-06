@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CoolEffect;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -93,6 +94,7 @@ namespace remake
                                     else
                                         opponent.Damage((int)(dice.GetDamage() * Atk) - opponent.GetValue());
 
+                                    print("Atk dice use skill " + dice.GetDiceType());
                                     dice.UseSkill(this);
                                     OnTurnEnd?.Invoke();
                                 }
@@ -105,6 +107,7 @@ namespace remake
             else
                 dice.Shoot(GetUseDicePos(), DiceMoveSpeed.Fast, () =>
                 {
+                    print("DEf dice use skill " + dice.GetDiceType());
                     dice.UseSkill(this);
                     OnTurnEnd?.Invoke();
                 });
@@ -178,11 +181,13 @@ namespace remake
         public void AddHp(int num)
         {
             Hp += num;
+            EffectManager.Instance.CreateGreenText("Hp + " + num, transform.position);
         }
 
         public void FullHeal()
         {
             Hp = fullHp;
+            EffectManager.Instance.CreateGreenText("Full Heal", transform.position);
         }
 
         public bool IsAtkState()
@@ -232,6 +237,7 @@ namespace remake
                         t = dices[1];
                         dices.RemoveAt(1);
                         Destroy(t.gameObject);
+                        print("skill manager call with triple");
                         SkillManager.SetDiceFunc(dices[0], this);
 
                         onPrepared?.Invoke();
@@ -276,6 +282,8 @@ namespace remake
                     var t = dices[1];
                     dices.RemoveAt(1);
                     Destroy(t.gameObject);
+                    print("skill manager call with triple");
+                    SkillManager.SetDiceFunc(dices[0], this);
                     onPrepared?.Invoke();
                 });
             }
@@ -289,6 +297,8 @@ namespace remake
                     var t = dices[2];
                     dices.RemoveAt(2);
                     Destroy(t.gameObject);
+                    print("skill manager call with triple");
+                    SkillManager.SetDiceFunc(dices[0], this);
                     onPrepared?.Invoke();
                 });
             }
@@ -302,6 +312,8 @@ namespace remake
                     var t = dices[2];
                     dices.RemoveAt(2);
                     Destroy(t.gameObject);
+                    print("skill manager call with triple");
+                    SkillManager.SetDiceFunc(dices[0], this);
                     onPrepared?.Invoke();
                 });
             }
