@@ -129,8 +129,8 @@ namespace remake
                         }
                         else
                         {
-                            players[0].ChangeAttack();
-                            players[1].ChangeAttack();
+                            players[0].ChangeAttackState();
+                            players[1].ChangeAttackState();
                             players[0].ResetThrowCount();
                             players[1].ResetThrowCount();
                             preparedPlayer.Clear();
@@ -157,6 +157,8 @@ namespace remake
 
         private void Awake()
         {
+            SkillManager.ReadSkill();
+
             #region get_text_object
 
             flowText = GetComponentsInChildren<TMP_Text>()[(int)TextIndex.GameState];

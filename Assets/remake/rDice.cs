@@ -18,6 +18,7 @@ namespace remake
         private DiceType _diceType;
         private TMP_Text _text;
         private int _value;
+        private UnityAction<rPlayer, rDice> diceSkills;
         private bool moveable;
         private UnityAction OnDicePrepared;
         private Vector2 pos = new(0, 0);
@@ -149,5 +150,46 @@ namespace remake
                 action?.Invoke();
             });
         }
+
+        public void SetColorByAttack(bool isAttacking)
+        {
+            var image = GetComponentInChildren<SpriteRenderer>();
+
+            var colorHex = isAttacking ? "#933E3E" : "#578DD4";
+
+            if (ColorUtility.TryParseHtmlString(colorHex, out var newColor))
+                image.color = newColor;
+            else
+                Debug.LogError("Invalid color code.");
+        }
+
+        public void AddFunction(UnityAction<rPlayer, rDice> skillItem2)
+        {
+            diceSkills += skillItem2;
+        }
+
+        public void UseSkill(rPlayer player)
+        {
+            diceSkills?.Invoke(player, this);
+        }
+
+        #region trueDamage
+
+        private bool trueDamage;
+
+        public bool GetTrueDamage()
+        {
+            return trueDamage;
+        }
+
+        public void SetTrueDamage()
+        {
+            trueDamage = true;
+            transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
+
+            GetComponentInChildren<SpriteRenderer>().color = Color.white;
+        }
+
+        #endregion
     }
 }

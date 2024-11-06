@@ -16,13 +16,14 @@ namespace remake
     {
         public static float DiceDistance = 1.5f;
         public static int fullHp = 100;
-        private readonly int Atk = 1;
+        public static float initAtk = 1;
         private readonly List<rDice> dices = new();
         private int _hp;
         private int _score;
+        private float Atk = 1;
         private Slider hpSlider;
 
-        private bool is_attacking;
+        private bool isAttacking;
         private rPlayer opponent;
 
         public int score
@@ -51,12 +52,13 @@ namespace remake
             GetComponentInChildren<TMP_Text>().enabled = true;
 
             Hp = fullHp;
+            Atk = initAtk;
             score = 0;
         }
 
         public void SetAttack(bool b)
         {
-            is_attacking = b;
+            isAttacking = b;
         }
 
         public void SetOpponent(rPlayer p)
@@ -76,18 +78,22 @@ namespace remake
             var dice = GetDice();
             if (!dice)
             {
-                print(transform.name + " run out of dice");
                 OnTurnEnd?.Invoke();
                 return;
             }
 
-            if (is_attacking)
+            if (isAttacking)
                 dice.Shoot(opponent.GetUseDicePos(), DiceMoveSpeed.Fast, () =>
                     {
-                        if (dice.GetValue() > opponent.GetValue())
+                        if (dice.GetValue() > opponent.GetValue() || dice.GetTrueDamage())
                             dice.Shoot(opponent.GetPos(), DiceMoveSpeed.Normal, () =>
                                 {
-                                    opponent.Damage(dice.GetDamage() + Atk);
+                                    if (dice.GetTrueDamage())
+                                        opponent.Damage((int)(dice.GetDamage() * Atk));
+                                    else
+                                        opponent.Damage((int)(dice.GetDamage() * Atk) - opponent.GetValue());
+
+                                    dice.UseSkill(this);
                                     OnTurnEnd?.Invoke();
                                 }
                             );
@@ -97,7 +103,11 @@ namespace remake
                     }
                 );
             else
-                dice.Shoot(GetUseDicePos(), DiceMoveSpeed.Fast, () => { OnTurnEnd?.Invoke(); });
+                dice.Shoot(GetUseDicePos(), DiceMoveSpeed.Fast, () =>
+                {
+                    dice.UseSkill(this);
+                    OnTurnEnd?.Invoke();
+                });
         }
 
 
@@ -150,9 +160,34 @@ namespace remake
             Hp = fullHp;
         }
 
-        public void ChangeAttack()
+        public void ChangeAttackState()
         {
-            is_attacking = !is_attacking;
+            isAttacking = !isAttacking;
+        }
+
+        public void AddAttack(int i)
+        {
+            Atk += i;
+        }
+
+        public void MultiplyAttack(int num)
+        {
+            Atk *= num;
+        }
+
+        public void AddHp(int num)
+        {
+            Hp += num;
+        }
+
+        public void FullHeal()
+        {
+            Hp = fullHp;
+        }
+
+        public bool IsAtkState()
+        {
+            return isAttacking;
         }
 
         #region debug
@@ -178,7 +213,7 @@ namespace remake
             throwCount = 0;
         }
 
-        private static void CheckDiceIsTriple(List<rDice> dices, UnityAction onPrepared)
+        private void CheckDiceIsTriple(List<rDice> dices, UnityAction onPrepared)
         {
             if (dices.Count != 3) return;
             // check all value is same
@@ -193,10 +228,12 @@ namespace remake
                     {
                         var t = dices[2];
                         dices.RemoveAt(2);
-                        Destroy(t);
+                        Destroy(t.gameObject);
                         t = dices[1];
                         dices.RemoveAt(1);
-                        Destroy(t);
+                        Destroy(t.gameObject);
+                        SkillManager.SetDiceFunc(dices[0], this);
+
                         onPrepared?.Invoke();
                     });
                 });
@@ -238,7 +275,7 @@ namespace remake
                 {
                     var t = dices[1];
                     dices.RemoveAt(1);
-                    Destroy(t);
+                    Destroy(t.gameObject);
                     onPrepared?.Invoke();
                 });
             }
@@ -251,7 +288,7 @@ namespace remake
                 {
                     var t = dices[2];
                     dices.RemoveAt(2);
-                    Destroy(t);
+                    Destroy(t.gameObject);
                     onPrepared?.Invoke();
                 });
             }
@@ -264,7 +301,7 @@ namespace remake
                 {
                     var t = dices[2];
                     dices.RemoveAt(2);
-                    Destroy(t);
+                    Destroy(t.gameObject);
                     onPrepared?.Invoke();
                 });
             }
@@ -291,14 +328,7 @@ namespace remake
             var sameBefore = nextTriple && throwCount != 0;
             throwCount++;
 
-            var image = dice.GetComponentInChildren<SpriteRenderer>();
-
-            var colorHex = is_attacking ? "#933E3E" : "#578DD4";
-
-            if (ColorUtility.TryParseHtmlString(colorHex, out var newColor))
-                image.color = newColor;
-            else
-                Debug.LogError("Invalid color code.");
+            dice.SetColorByAttack(isAttacking);
             dices.Add(dice);
             dice.Roll(() =>
             {
