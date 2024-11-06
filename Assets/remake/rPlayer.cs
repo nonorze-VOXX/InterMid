@@ -6,6 +6,12 @@ using UnityEngine.UI;
 
 namespace remake
 {
+    public enum DiceMoveSpeed
+    {
+        Normal,
+        Fast
+    }
+
     public class rPlayer : MonoBehaviour
     {
         public static float DiceDistance = 1.5f;

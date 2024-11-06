@@ -15,6 +15,13 @@ namespace remake
         End
     }
 
+    internal enum TextIndex
+    {
+        GameState,
+        Turn,
+        Round
+    }
+
     internal enum ButtonIndex
     {
         TurnAddOne
