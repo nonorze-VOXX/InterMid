@@ -1,22 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using remake.GameFlow;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace remake
 {
-    internal enum flow
-    {
-        Welcome,
-        RoundStart,
-        Prepare, // turn start
-        BeforeBattle, // one dice start
-        Battle,
-        End
-    }
-
+    //todo: make esc to close game
     internal enum TextIndex
     {
         GameState,
@@ -50,22 +40,21 @@ namespace remake
         [SerializeField] private Button p1TripleButton;
         [SerializeField] private Button p1AttackUpButton;
         [SerializeField] private Button p1HpDecreaseButton;
+        public int shootCount;
 
         private readonly HashSet<rPlayer> preparedPlayer = new();
 
-        private readonly HashSet<rPlayer> turnEndPlayer = new();
+        private IGameState _gameState;
         private int _round;
 
-        private flow _state;
 
         private int _turn;
         private rPlayer[] players;
-
-        private bool prepareOk;
-        private int shootCount;
         private rPlayer winner;
 
-        private int round
+        public bool prepareOk { get; set; }
+
+        public int round
         {
             get => _round;
             set
@@ -75,7 +64,7 @@ namespace remake
             }
         }
 
-        private int turn
+        public int turn
         {
             get => _turn;
             set
@@ -85,90 +74,15 @@ namespace remake
             }
         }
 
-        private flow state
+        private IGameState GameState
         {
-            get => _state;
+            get => _gameState;
             set
             {
-                flowText.text = value.ToString();
-                // like on exit
-                switch (_state)
-                {
-                    case flow.Welcome: // Game Start
-                        welcomeText.gameObject.SetActive(false);
-                        break;
-                    case flow.RoundStart:
-                        roundText.enabled = false;
-                        foreach (var rPlayer in players) rPlayer.NewRound();
-                        break;
-                    case flow.Prepare:
-                        break;
-                    case flow.BeforeBattle:
-                        break;
-                    case flow.Battle:
-                        break;
-                    case flow.End:
-                        winner = null;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-
-                _state = value;
-
-
-                // like on enter
-                switch (value)
-                {
-                    case flow.Welcome:
-                        // make text show
-                        // make text show "press any key to start"
-                        welcomeText.gameObject.SetActive(true);
-                        welcomeText.text = "press r key to start";
-                        turnText.enabled = false;
-                        if (turnText) turnText.enabled = false;
-                        break;
-                    case flow.RoundStart:
-                        round++;
-                        turn = 0;
-                        roundText.enabled = true;
-                        turnText.enabled = false;
-                        players[0].gameObject.SetActive(true);
-                        players[1].gameObject.SetActive(true);
-                        break;
-                    case flow.Prepare:
-                        shootCount = 0;
-                        turnText.enabled = true;
-                        turn++;
-                        if (turn > max_turn && !isDuce())
-                        {
-                            // do nothing, wait update do 
-                        }
-                        else
-                        {
-                            players[0].ChangeAttackState();
-                            players[1].ChangeAttackState();
-                            players[0].ResetThrowCount();
-                            players[1].ResetThrowCount();
-                            preparedPlayer.Clear();
-                            players[0].Prepare(OnPrepareDone(players[0]));
-                            players[1].Prepare(OnPrepareDone(players[1]));
-                            prepareOk = false;
-                        }
-
-                        break;
-                    case flow.BeforeBattle:
-                        break;
-                    case flow.Battle:
-                        turnEndPlayer.Clear();
-                        players[0].Turn(OnOneShootEnd(players[0]));
-                        players[1].Turn(OnOneShootEnd(players[1]));
-                        break;
-                    case flow.End:
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                flowText.text = value.GetType().ToString().Split('.')[^1];
+                _gameState?.OnExit();
+                _gameState = value;
+                _gameState?.OnEnter();
             }
         }
 
@@ -244,7 +158,7 @@ namespace remake
 
             #endregion
 
-            state = flow.Welcome;
+            ToWelcomeState();
             ChangeDebugMode(false);
         }
 
@@ -256,40 +170,8 @@ namespace remake
                 ChangeDebugMode(nextDebugMode);
             }
 
-            switch (state)
-            {
-                case flow.Welcome:
-                    if (Input.GetKeyDown(KeyCode.R)) state = flow.RoundStart;
-                    break;
-                case flow.RoundStart:
-                    if (Input.GetKeyDown(KeyCode.R)) state = flow.Prepare;
-
-                    break;
-                case flow.Prepare:
-
-                    if (turn > max_turn && !isDuce())
-                    {
-                        state = flow.RoundStart;
-                        roundText.text = "no one win this round\n Press R to next round";
-                    }
-                    else if (prepareOk)
-                    {
-                        state = flow.BeforeBattle;
-                    }
-
-                    break;
-                case flow.BeforeBattle:
-                    state = flow.Battle;
-                    break;
-                case flow.Battle:
-
-                    break;
-                case flow.End:
-                    if (Input.GetKeyDown(KeyCode.R)) state = flow.Welcome;
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            if (Input.GetKeyDown(KeyCode.R)) GameState.OnPressR();
+            GameState.Update();
         }
 
         private void ChangeDebugMode(bool nextDebugMode)
@@ -299,72 +181,76 @@ namespace remake
             p1TripleButton.gameObject.SetActive(nextDebugMode);
             p1AttackUpButton.gameObject.SetActive(nextDebugMode);
             p1HpDecreaseButton.gameObject.SetActive(nextDebugMode);
-            // foreach (var rPlayer in players) rPlayer.SetDebugText(nextDebugMode);
         }
 
-        private UnityAction OnPrepareDone(rPlayer rPlayer)
-        {
-            return
-                () =>
-                {
-                    preparedPlayer.Add(rPlayer);
-                    if (preparedPlayer.Count < 2) return;
-                    prepareOk = true;
-                };
-        }
-
-        private UnityAction OnOneShootEnd(rPlayer player)
-        {
-            return () =>
-            {
-                turnEndPlayer.Add(player);
-                if (turnEndPlayer.Count < 2) return;
-                shootCount++;
-                players[0].UsedDice();
-                players[1].UsedDice();
-                if (players[0].Hp <= 0)
-                {
-                    if (players[1].score >= 2)
-                    {
-                        state = flow.End;
-                    }
-                    else
-                    {
-                        players[1].score++;
-                        state = flow.RoundStart;
-                        roundText.text = "Player 2 win this round\n Press R to next";
-                    }
-                    // next turn
-                }
-                else if (players[1].Hp <= 0)
-                {
-                    if (players[0].score >= 2)
-                    {
-                        state = flow.End;
-                    }
-                    else
-                    {
-                        players[0].score++;
-                        state = flow.RoundStart;
-                        roundText.text = "Player 1 win this round\n Press R to next";
-                    }
-                    // next turn
-                }
-                else if (shootCount >= rPlayer.maxDiceCount)
-                {
-                    // sus
-                    state = flow.Prepare;
-                }
-                else
-                {
-                    state = flow.BeforeBattle;
-                }
-            };
-        }
-
-        private bool isDuce()
+        public bool IsDuce()
         {
             return round > 3;
         }
+
+        public void ResetShootCount()
+        {
+            shootCount = 0;
+        }
+
+        public bool AllPlayerPrepared()
+        {
+            return preparedPlayer.Count == 2;
+        }
+
+        public void ClearPreparedPlayer()
+        {
+            preparedPlayer.Clear();
+        }
+
+        public void AddPreParedPlayer(rPlayer rPlayer)
+        {
+            preparedPlayer.Add(rPlayer);
+        }
+
+        public void SetRoundText(string noOneWinThisRoundPressRToNextRound)
+        {
+            roundText.text = noOneWinThisRoundPressRToNextRound;
+        }
+
+        public void ResetWinner()
+        {
+            winner = null;
+        }
+
+        #region flowChange
+
+        public void ToBeforeBattleState()
+        {
+            GameState = new BeforeBattleState(this);
+        }
+
+        public void ToWelcomeState()
+        {
+            GameState = new WelcomeState(this, welcomeText);
+        }
+
+        public void ToEndState()
+        {
+            GameState = new EndState(this);
+        }
+
+        public void ToRoundStartState()
+        {
+            GameState = new RoundStartState(this, players, roundText);
+        }
+
+
+        public void ToPrepareState()
+        {
+            GameState = new PrepareState(this, players, turnText);
+        }
+
+        public void ToBattleState()
+        {
+            GameState = new BattleState(this, players, roundText);
+        }
+
+        #endregion
     }
 }

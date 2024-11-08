@@ -31,44 +31,10 @@ namespace remake
         private TMP_Text statusText;
 
         private readonly List<rDice> dices = new();
-        private float _atk = 1;
-        private int _hp;
-        private int _score;
         private Slider hpSlider;
 
         private bool isAttacking;
         private rPlayer opponent;
-
-        private float Atk
-        {
-            get => _atk;
-            set
-            {
-                _atk = value;
-                statusText.text = "Atk: " + value + ", Hp: " + Hp;
-            }
-        }
-
-        public int score
-        {
-            get => _score;
-            set
-            {
-                _score = value;
-                scoreText.text = "Score: " + value;
-            }
-        }
-
-        public int Hp
-        {
-            get => _hp;
-            set
-            {
-                _hp = value;
-                statusText.text = "Atk: " + Atk + ", Hp: " + Hp;
-                hpSlider.value = _hp / (float)fullHp;
-            }
-        }
 
         private void Awake()
         {
@@ -138,7 +104,6 @@ namespace remake
             else
                 dice.Shoot(GetUseDicePos(), DiceMoveSpeed.Fast, () =>
                 {
-                    print("DEf dice use skill " + dice.GetDiceType());
                     dice.UseSkill(this);
                     OnTurnEnd?.Invoke();
                 });
@@ -230,6 +195,45 @@ namespace remake
             return isAttacking;
         }
 
+        #region Properties
+
+        private float _atk = 1;
+        private int _hp;
+        private int _score;
+
+        private float Atk
+        {
+            get => _atk;
+            set
+            {
+                _atk = value;
+                statusText.text = "Atk: " + value + ", Hp: " + Hp;
+            }
+        }
+
+        public int score
+        {
+            get => _score;
+            set
+            {
+                _score = value;
+                scoreText.text = "Score: " + value;
+            }
+        }
+
+        public int Hp
+        {
+            get => _hp;
+            set
+            {
+                _hp = value;
+                statusText.text = "Atk: " + Atk + ", Hp: " + Hp;
+                hpSlider.value = _hp / (float)fullHp;
+            }
+        }
+
+        #endregion
+
         #region debug
 
         private bool nextTriple;
@@ -317,7 +321,6 @@ namespace remake
                     var t = dices[1];
                     dices.RemoveAt(1);
                     Destroy(t.gameObject);
-                    print("skill manager call with triple");
                     SkillManager.SetDiceFunc(dices[0], this);
                     onPrepared?.Invoke();
                 });
