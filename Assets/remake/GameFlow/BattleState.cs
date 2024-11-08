@@ -50,13 +50,14 @@ namespace remake.GameFlow
                 players[1].UsedDice();
                 if (players[0].Hp <= 0)
                 {
+                    players[1].score++;
                     if (players[1].score >= 2)
                     {
+                        gm.winner = players[1];
                         gm.ToEndState();
                     }
                     else
                     {
-                        players[1].score++;
                         gm.ToRoundStartState();
                         roundText.text = "Player 2 win this round\n Press R to next";
                     }
@@ -64,13 +65,14 @@ namespace remake.GameFlow
                 }
                 else if (players[1].Hp <= 0)
                 {
+                    players[0].score++;
                     if (players[0].score >= 2)
                     {
+                        gm.winner = players[0];
                         gm.ToEndState();
                     }
                     else
                     {
-                        players[0].score++;
                         gm.ToRoundStartState();
                         roundText.text = "Player 1 win this round\n Press R to next";
                     }

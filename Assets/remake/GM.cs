@@ -44,6 +44,7 @@ namespace remake
         [SerializeField] private Button p1HpDecreaseButton;
 
         public int shootCount;
+        public rPlayer winner;
 
         private readonly HashSet<rPlayer> preparedPlayer = new();
 
@@ -53,7 +54,6 @@ namespace remake
 
         private int _turn;
         private rPlayer[] players;
-        private rPlayer winner;
 
         public bool prepareOk { get; set; }
 
@@ -239,7 +239,7 @@ namespace remake
 
         public void ToEndState()
         {
-            GameState = new EndState(this, endText);
+            GameState = new EndState(this, endText, turnText, roundText, roundCountText);
         }
 
         public void ToRoundStartState()
