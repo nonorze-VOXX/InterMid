@@ -36,7 +36,6 @@ namespace remake
         private static readonly int PLAYER_COUNT = 2;
 
         private static readonly int max_turn = 10;
-        // todo: speed running for deadline 
 
         [SerializeField] private rPlayer playerPrefab;
 
@@ -137,7 +136,7 @@ namespace remake
                         shootCount = 0;
                         turnText.enabled = true;
                         turn++;
-                        if (turn > max_turn)
+                        if (turn > max_turn && !isDuce())
                         {
                             // do nothing, wait update do 
                         }
@@ -236,8 +235,6 @@ namespace remake
         private void Update()
         {
             if (Input.GetKeyDown(KeyCode.Tab))
-                // todo: debug mode
-
             {
                 var nextDebugMode = !flowText.enabled;
                 ChangeDebugMode(nextDebugMode);
@@ -254,11 +251,10 @@ namespace remake
                     break;
                 case flow.Prepare:
 
-                    if (turn > max_turn)
-                        // todo: round end , judge winner
+                    if (turn > max_turn && !isDuce())
                     {
                         state = flow.RoundStart;
-                        roundText.text = "no one get a score\n Press R to next round";
+                        roundText.text = "no one win this round\n Press R to next round";
                     }
                     else if (prepareOk)
                     {
@@ -318,7 +314,7 @@ namespace remake
                     {
                         players[1].score++;
                         state = flow.RoundStart;
-                        roundText.text = "Player 2 get a score\n Press R to next";
+                        roundText.text = "Player 2 win this round\n Press R to next";
                     }
                     // next turn
                 }
@@ -332,7 +328,7 @@ namespace remake
                     {
                         players[0].score++;
                         state = flow.RoundStart;
-                        roundText.text = "Player 1 get a score\n Press R to next";
+                        roundText.text = "Player 1 win this round\n Press R to next";
                     }
                     // next turn
                 }
@@ -346,6 +342,11 @@ namespace remake
                     state = flow.BeforeBattle;
                 }
             };
+        }
+
+        private bool isDuce()
+        {
+            return round > 3;
         }
     }
 }
