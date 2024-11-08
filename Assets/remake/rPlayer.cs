@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using CoolEffect;
 using TMPro;
 using UnityEngine;
@@ -197,6 +198,16 @@ namespace remake
             Atk = initAtk;
         }
 
+        public int GetDiceCount()
+        {
+            return dices.Count;
+        }
+
+        public void ResetScore()
+        {
+            score = 0;
+        }
+
         #region Properties
 
         private float _atk = 1;
@@ -229,6 +240,7 @@ namespace remake
             set
             {
                 _hp = value;
+                _hp = Math.Max(0, _hp);
                 hpSlider.value = _hp / (float)fullHp;
                 UpdateStatus();
             }

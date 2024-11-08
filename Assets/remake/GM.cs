@@ -131,7 +131,7 @@ namespace remake
             p1HpDecreaseButton.onClick.AddListener(() =>
             {
                 if (players.Length > 0)
-                    players[0].Hp -= 10;
+                    players[0].Hp -= 50;
             });
 
             #endregion
@@ -239,7 +239,11 @@ namespace remake
 
         public void ToEndState()
         {
-            GameState = new EndState(this, endText, turnText, roundText, roundCountText);
+            // clean dice
+            for (var i = 0; i < players.Length; i++)
+            for (var j = 0; j < players[i].GetDiceCount(); j++)
+                players[i].UsedDice();
+            GameState = new EndState(this, players, endText, turnText, roundText, roundCountText);
         }
 
         public void ToRoundStartState()
