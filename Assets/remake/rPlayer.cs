@@ -195,6 +195,11 @@ namespace remake
             return isAttacking;
         }
 
+        public void AtkReset()
+        {
+            Atk = initAtk;
+        }
+
         #region Properties
 
         private float _atk = 1;

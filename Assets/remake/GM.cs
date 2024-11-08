@@ -164,6 +164,7 @@ namespace remake
 
         private void Update()
         {
+            if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
             if (Input.GetKeyDown(KeyCode.Tab))
             {
                 var nextDebugMode = !flowText.enabled;
@@ -237,9 +238,8 @@ namespace remake
 
         public void ToRoundStartState()
         {
-            GameState = new RoundStartState(this, players, roundText);
+            GameState = new RoundStartState(this, players, roundText, turnText);
         }
-
 
         public void ToPrepareState()
         {

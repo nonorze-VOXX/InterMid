@@ -9,7 +9,7 @@ namespace remake
 {
     public class SkillManager
     {
-        private static readonly List<Tuple<DiceType, string>> defSkills = new();
+        private static readonly List<(DiceType type, string effect)> defSkills = new();
         private static readonly List<Tuple<DiceType, string>> atkSkills = new();
 
         public static void ReadSkill()
@@ -68,7 +68,7 @@ namespace remake
                     //     Debug.Log(value);
                     // }
                     var type = GetDiceType(values[0]);
-                    defSkills.Add(new Tuple<DiceType, string>(type, values[1]));
+                    defSkills.Add((type, values[1]));
                 }
             }
             else
