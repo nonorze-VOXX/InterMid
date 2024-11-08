@@ -147,6 +147,7 @@ namespace remake
 
         private void Damage(int value)
         {
+            EffectManager.Instance.CreateRedText("-" + value, transform.position);
             Hp -= value;
         }
 
@@ -201,11 +202,13 @@ namespace remake
 
         public void AddAttack(float i)
         {
+            EffectManager.Instance.CreateRedText("+" + i, transform.position);
             Atk += i;
         }
 
         public void MultiplyAttack(float num)
         {
+            EffectManager.Instance.CreateRedText("*" + num, transform.position);
             Atk *= num;
         }
 

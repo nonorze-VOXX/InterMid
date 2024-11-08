@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace CoolEffect
 {
-    public class GreenText : MonoBehaviour
+    public class EffectText : MonoBehaviour
     {
         private TMP_Text text;
 
@@ -21,6 +21,11 @@ namespace CoolEffect
         private void Update()
         {
             transform.position = (Vector2)transform.position + Vector2.up * (Time.deltaTime * 100);
+        }
+
+        public void SetColor(Color color)
+        {
+            text.color = color;
         }
 
         public void SetText(string s)
