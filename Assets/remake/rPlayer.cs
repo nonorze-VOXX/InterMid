@@ -89,7 +89,6 @@ namespace remake
                                     else
                                         opponent.Damage((int)(dice.GetDamage() * Atk) - opponent.GetValue());
 
-                                    print("Atk dice use skill " + dice.GetDiceType());
                                     dice.UseSkill(this);
                                     OnTurnEnd?.Invoke();
                                 }
@@ -284,7 +283,6 @@ namespace remake
                         t = dices[1];
                         dices.RemoveAt(1);
                         Destroy(t.gameObject);
-                        print("skill manager call with triple");
                         SkillManager.SetDiceFunc(dices[0], this);
 
                         onPrepared?.Invoke();
@@ -343,7 +341,6 @@ namespace remake
                     var t = dices[2];
                     dices.RemoveAt(2);
                     Destroy(t.gameObject);
-                    print("skill manager call with triple");
                     SkillManager.SetDiceFunc(dices[0], this);
                     onPrepared?.Invoke();
                 });
@@ -358,7 +355,6 @@ namespace remake
                     var t = dices[2];
                     dices.RemoveAt(2);
                     Destroy(t.gameObject);
-                    print("skill manager call with triple");
                     SkillManager.SetDiceFunc(dices[0], this);
                     onPrepared?.Invoke();
                 });

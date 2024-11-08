@@ -19,8 +19,6 @@ namespace remake
             // create skill
             GenDefSkill();
             GenAtkSkill();
-            Debug.Log(defSkills);
-            Debug.Log(atkSkills);
         }
 
         private static void GenAtkSkill()
@@ -63,10 +61,6 @@ namespace remake
                 {
                     var values = line.Split(',');
                     if (values.Length != 2) continue;
-                    // foreach (var value in values)
-                    // {
-                    //     Debug.Log(value);
-                    // }
                     var type = GetDiceType(values[0]);
                     defSkills.Add((type, values[1]));
                 }
@@ -129,7 +123,6 @@ namespace remake
                         var pattern = @"(Hp)([+])(\d+)";
                         var match = Regex.Match(value, pattern);
 
-                        Debug.Log("DEf Match: " + match);
                         if (match.Success)
                         {
                             var op = match.Groups[2].Value;
@@ -137,7 +130,6 @@ namespace remake
                             switch (op)
                             {
                                 case "+":
-                                    Debug.Log("Hp + " + num);
                                     player.AddHp(num);
                                     break;
                             }
