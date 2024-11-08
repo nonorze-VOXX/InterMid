@@ -28,7 +28,9 @@ namespace remake
     internal enum ButtonIndex
     {
         TurnAddOne,
-        P1Triple
+        P1Triple,
+        P1AttackUp,
+        P1HpDecrease
     }
 
     public class GM : MonoBehaviour
@@ -46,6 +48,8 @@ namespace remake
         [SerializeField] private TMP_Text roundCountText;
         [SerializeField] private Button turnAddOneButton;
         [SerializeField] private Button p1TripleButton;
+        [SerializeField] private Button p1AttackUpButton;
+        [SerializeField] private Button p1HpDecreaseButton;
 
         private readonly HashSet<rPlayer> preparedPlayer = new();
 
@@ -197,6 +201,18 @@ namespace remake
                 if (players.Length > 0)
                     players[0].NextThrowTripleDice();
             });
+            p1AttackUpButton = GetComponentsInChildren<Button>()[(int)ButtonIndex.P1AttackUp];
+            p1AttackUpButton.onClick.AddListener(() =>
+            {
+                if (players.Length > 0)
+                    players[0].AddAttack(1);
+            });
+            p1HpDecreaseButton = GetComponentsInChildren<Button>()[(int)ButtonIndex.P1HpDecrease];
+            p1HpDecreaseButton.onClick.AddListener(() =>
+            {
+                if (players.Length > 0)
+                    players[0].Hp -= 10;
+            });
 
             #endregion
 
@@ -281,6 +297,8 @@ namespace remake
             flowText.enabled = nextDebugMode;
             turnAddOneButton.gameObject.SetActive(nextDebugMode);
             p1TripleButton.gameObject.SetActive(nextDebugMode);
+            p1AttackUpButton.gameObject.SetActive(nextDebugMode);
+            p1HpDecreaseButton.gameObject.SetActive(nextDebugMode);
             // foreach (var rPlayer in players) rPlayer.SetDebugText(nextDebugMode);
         }
 
