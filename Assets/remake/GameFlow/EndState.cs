@@ -1,25 +1,27 @@
-﻿using System;
+﻿using TMPro;
 
 namespace remake.GameFlow
 {
     public class EndState : IGameState
     {
         private readonly GM gm;
+        private readonly TMP_Text endText;
 
 
-        public EndState(GM gm)
+        public EndState(GM gm, TMP_Text endText)
         {
             this.gm = gm;
+            this.endText = endText;
         }
 
         public void OnExit()
         {
             gm.ResetWinner();
+            endText.enabled = false;
         }
 
         public void Update()
         {
-            throw new NotImplementedException();
         }
 
         public void OnPressR()
@@ -29,7 +31,8 @@ namespace remake.GameFlow
 
         public void OnEnter()
         {
-            throw new NotImplementedException();
+            endText.text = "press r key to restart,\n Press esc to exit the game.";
+            endText.enabled = true;
         }
     }
 }

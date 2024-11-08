@@ -6,13 +6,13 @@ using UnityEngine.UI;
 
 namespace remake
 {
-    //todo: make esc to close game
     internal enum TextIndex
     {
         GameState,
         Turn,
         Round,
-        RoundCount
+        RoundCount,
+        EndText
     }
 
     internal enum ButtonIndex
@@ -36,10 +36,13 @@ namespace remake
         [SerializeField] private TMP_Text flowText;
         [SerializeField] private TMP_Text roundText;
         [SerializeField] private TMP_Text roundCountText;
+        [SerializeField] private TMP_Text endText;
+
         [SerializeField] private Button turnAddOneButton;
         [SerializeField] private Button p1TripleButton;
         [SerializeField] private Button p1AttackUpButton;
         [SerializeField] private Button p1HpDecreaseButton;
+
         public int shootCount;
 
         private readonly HashSet<rPlayer> preparedPlayer = new();
@@ -102,6 +105,9 @@ namespace remake
             roundCountText = GetComponentsInChildren<TMP_Text>()[(int)TextIndex.RoundCount];
             round = 0;
             roundText.enabled = false;
+
+            endText = GetComponentsInChildren<TMP_Text>()[(int)TextIndex.EndText];
+            endText.enabled = false;
 
             #endregion
 
@@ -233,7 +239,7 @@ namespace remake
 
         public void ToEndState()
         {
-            GameState = new EndState(this);
+            GameState = new EndState(this, endText);
         }
 
         public void ToRoundStartState()
