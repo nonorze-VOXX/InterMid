@@ -3,6 +3,7 @@ using CoolEffect;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace remake
@@ -25,7 +26,10 @@ namespace remake
         public static int fullHp = 100;
         public static float initAtk = 1;
         [SerializeField] private TMP_Text scoreText;
-        [SerializeField] private TMP_Text atkText;
+
+        [FormerlySerializedAs("atkText")] [SerializeField]
+        private TMP_Text statusText;
+
         private readonly List<rDice> dices = new();
         private float _atk = 1;
         private int _hp;
@@ -41,7 +45,7 @@ namespace remake
             set
             {
                 _atk = value;
-                atkText.text = "Atk: " + value;
+                statusText.text = "Atk: " + value + ", Hp: " + Hp;
             }
         }
 
@@ -61,6 +65,7 @@ namespace remake
             set
             {
                 _hp = value;
+                statusText.text = "Atk: " + Atk + ", Hp: " + Hp;
                 hpSlider.value = _hp / (float)fullHp;
             }
         }
@@ -73,7 +78,7 @@ namespace remake
             #region GetText
 
             var texts = GetComponentsInChildren<TMP_Text>();
-            atkText = texts[(int)PlayerText.Atk];
+            statusText = texts[(int)PlayerText.Atk];
             scoreText = texts[(int)PlayerText.Score];
 
             #endregion
