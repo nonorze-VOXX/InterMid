@@ -43,9 +43,9 @@ namespace remake.GameFlow
             gm.turn = 0;
             roundText.enabled = true;
             turnText.enabled = false;
-            players[0].AtkReset();
+            // players[0].AtkReset();
             players[0].gameObject.SetActive(true);
-            players[1].AtkReset();
+            // players[1].AtkReset();
             players[1].gameObject.SetActive(true);
         }
     }

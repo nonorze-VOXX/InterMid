@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 23ff55b8fc1f41446b5bdea8e93b7db4
+guid: 37a17bf51862bc34a96ecdf795657e9f
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -48,7 +48,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 10
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -123,7 +123,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Dead (78x58)_0
+      name: Hit_0
       rect:
         serializedVersion: 2
         x: 0
@@ -137,14 +137,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b58904216021f874ea6247a249771925
-      internalID: 14059387
+      spriteID: 2ace8273b7875d449bbee67671dd4b1d
+      internalID: -1850158349
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Dead (78x58)_1
+      name: Hit_1
       rect:
         serializedVersion: 2
         x: 78
@@ -158,50 +158,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4338592eb77de0d47afb1e9966eb1a57
-      internalID: 858554242
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Dead (78x58)_2
-      rect:
-        serializedVersion: 2
-        x: 156
-        y: 0
-        width: 78
-        height: 58
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: b04c49c80fc89fd4cbb15777c568b454
-      internalID: -878270881
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Dead (78x58)_3
-      rect:
-        serializedVersion: 2
-        x: 234
-        y: 0
-        width: 78
-        height: 58
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 4e88049f31dd3f041a52a13f4d5606de
-      internalID: 307123814
+      spriteID: be8c8e1fd3c050b4e8c8dc2a709677bb
+      internalID: 1655608403
       vertices: []
       indices: 
       edges: []
@@ -217,10 +175,8 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Dead (78x58)_0: 14059387
-      Dead (78x58)_1: 858554242
-      Dead (78x58)_2: -878270881
-      Dead (78x58)_3: 307123814
+      Hit_0: -1850158349
+      Hit_1: 1655608403
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

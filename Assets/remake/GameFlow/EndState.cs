@@ -29,6 +29,7 @@ namespace remake.GameFlow
             gm.ResetWinner();
             endText.enabled = false;
             roundText.text = "";
+            foreach (var rPlayer in players) rPlayer.NewRound();
             foreach (var rPlayer in players) rPlayer.ResetScore();
         }
 

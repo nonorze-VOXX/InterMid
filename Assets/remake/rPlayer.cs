@@ -20,23 +20,38 @@ namespace remake
         Atk
     }
 
+    internal enum PlayerAnimation
+    {
+        Idle,
+        Attack,
+        Damaged,
+        Die
+    }
+
     public class rPlayer : MonoBehaviour
     {
-        public static float DiceDistance = 1.5f;
-        public static int fullHp = 100;
-        public static float initAtk = 1;
+        private static readonly float DiceDistance = 1.5f;
+        private static readonly int fullHp = 100;
+        private static readonly float initAtk = 1;
         [SerializeField] private TMP_Text scoreText;
 
         [SerializeField] private TMP_Text statusText;
 
         private readonly List<rDice> dices = new();
+
         private Slider hpSlider;
 
         private bool isAttacking;
         private rPlayer opponent;
+        private SpriteRenderer spriteRenderer;
 
         private void Awake()
         {
+            spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+            attackSprites = new List<Sprite>(Resources.LoadAll<Sprite>("Image/King/Attack"));
+            idleSprites = new List<Sprite>(Resources.LoadAll<Sprite>("Image/King/Idle"));
+            damagedSprites = new List<Sprite>(Resources.LoadAll<Sprite>("Image/King/Hit"));
+            dieSprites = new List<Sprite>(Resources.LoadAll<Sprite>("Image/King/Dead"));
             hpSlider = GetComponentInChildren<Slider>();
             GetComponentInChildren<TMP_Text>().enabled = true;
 
@@ -48,6 +63,7 @@ namespace remake
 
             #endregion
 
+            InvokeRepeating("UpdateAnimation", 0.0f, 0.1f);
             Hp = fullHp;
             Atk = initAtk;
             score = 0;
@@ -80,6 +96,8 @@ namespace remake
             }
 
             if (isAttacking)
+            {
+                SetAnimation(PlayerAnimation.Attack);
                 dice.Shoot(opponent.GetUseDicePos(), DiceMoveSpeed.Fast, () =>
                     {
                         if (dice.GetValue() > opponent.GetValue() || dice.GetTrueDamage())
@@ -99,12 +117,15 @@ namespace remake
                             );
                     }
                 );
+            }
             else
+            {
                 dice.Shoot(GetUseDicePos(), DiceMoveSpeed.Fast, () =>
                 {
                     dice.UseSkill(this);
                     OnTurnEnd?.Invoke();
                 });
+            }
         }
 
 
@@ -112,6 +133,7 @@ namespace remake
         {
             EffectManager.Instance.CreateRedText("-" + value, transform.position);
             Hp -= value;
+            SetAnimation(PlayerAnimation.Damaged);
         }
 
         private Vector2 GetPos()
@@ -156,6 +178,8 @@ namespace remake
             foreach (var dice in dices) Destroy(dice.gameObject);
             dices.Clear();
             Hp = fullHp;
+            Atk = initAtk;
+            SetAnimation(PlayerAnimation.Idle);
         }
 
         public void ChangeAttackState()
@@ -177,6 +201,7 @@ namespace remake
 
         public void AddHp(int num)
         {
+            if (Hp <= 0) return;
             Hp += num;
             Hp = Mathf.Min(Hp, fullHp);
             EffectManager.Instance.CreateGreenText("Hp + " + num, transform.position);
@@ -207,6 +232,68 @@ namespace remake
         {
             score = 0;
         }
+
+        #region Animation
+
+        private PlayerAnimation animationState = PlayerAnimation.Idle;
+        private List<Sprite> attackSprites;
+        private List<Sprite> dieSprites;
+        private List<Sprite> damagedSprites;
+        private List<Sprite> idleSprites;
+
+        private int animationIndex;
+
+        private void SetAnimation(PlayerAnimation state)
+        {
+            if (animationState == PlayerAnimation.Die && state == PlayerAnimation.Damaged) return;
+            animationState = state;
+            animationIndex = 0;
+            spriteRenderer.sprite = state switch
+            {
+                PlayerAnimation.Idle => idleSprites[0],
+                PlayerAnimation.Attack => attackSprites[0],
+                PlayerAnimation.Die => dieSprites[0],
+                PlayerAnimation.Damaged => damagedSprites[0],
+                _ => throw new ArgumentOutOfRangeException()
+            };
+        }
+
+        private void UpdateAnimation()
+        {
+            animationIndex++;
+            switch (animationState)
+            {
+                case PlayerAnimation.Idle:
+                    spriteRenderer.sprite = idleSprites[animationIndex % idleSprites.Count];
+                    break;
+                case PlayerAnimation.Attack:
+                    if (animationIndex >= attackSprites.Count)
+                    {
+                        SetAnimation(PlayerAnimation.Idle);
+                        return;
+                    }
+
+                    spriteRenderer.sprite = attackSprites[animationIndex % attackSprites.Count];
+                    break;
+                case PlayerAnimation.Die:
+                    if (animationIndex >= dieSprites.Count) animationIndex = dieSprites.Count - 1;
+                    spriteRenderer.sprite = dieSprites[animationIndex % dieSprites.Count];
+                    break;
+                case PlayerAnimation.Damaged:
+                    if (animationIndex >= damagedSprites.Count * 3)
+                    {
+                        SetAnimation(PlayerAnimation.Idle);
+                        return;
+                    }
+
+                    spriteRenderer.sprite = damagedSprites[animationIndex % damagedSprites.Count];
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        #endregion
 
         #region Properties
 
@@ -242,6 +329,7 @@ namespace remake
                 _hp = value;
                 _hp = Math.Max(0, _hp);
                 hpSlider.value = _hp / (float)fullHp;
+                if (_hp <= 0) SetAnimation(PlayerAnimation.Die);
                 UpdateStatus();
             }
         }
