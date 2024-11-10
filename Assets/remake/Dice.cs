@@ -81,12 +81,12 @@ namespace remake
         }
 
 
-        public void Shoot(Vector2 getUsingDicePosition, DiceMoveSpeed speed, UnityAction action)
+        public void Shoot(Vector2 getUsingDicePosition, DiceMoveSpeed speed, UnityAction onShootEndAction)
         {
             SetTargetPosition(getUsingDicePosition);
             SetMoveSpeed(speed);
             moveable = true;
-            AddListener(action);
+            AddListener(onShootEndAction);
         }
 
         private void AddListener(UnityAction action)
@@ -141,13 +141,13 @@ namespace remake
             this.value = value;
         }
 
-        public void MergeTo(Dice dice, UnityAction action)
+        public void MergeTo(Dice dice, UnityAction onMergeDone)
         {
             Shoot(dice.transform.position, DiceMoveSpeed.Normal, () =>
             {
                 dice.Add(this);
                 gameObject.SetActive(false);
-                action?.Invoke();
+                onMergeDone?.Invoke();
             });
         }
 

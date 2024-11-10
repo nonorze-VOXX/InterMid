@@ -25,7 +25,7 @@ namespace remake.GameFlow
 
         public void Update()
         {
-            if (gm.turn > max_turn && !gm.IsDuce())
+            if (gm.turn > max_turn && !IsDuce())
             {
                 gm.ToRoundStartState();
                 gm.SetRoundText("no one win this round\n Press R to next round");
@@ -43,10 +43,10 @@ namespace remake.GameFlow
 
         public void OnEnter()
         {
-            gm.ResetShootCount();
+            ResetShootCount();
             turnText.enabled = true;
             gm.turn++;
-            if (gm.turn > max_turn && !gm.IsDuce())
+            if (gm.turn > max_turn && !IsDuce())
             {
                 // do nothing, wait update do 
             }
@@ -63,12 +63,22 @@ namespace remake.GameFlow
             }
         }
 
+        private void ResetShootCount()
+        {
+            gm.shootCount = 0;
+        }
+
+        private bool IsDuce()
+        {
+            return gm.round > 3;
+        }
+
         private static UnityAction OnPrepareDone(Player player, GM gmAtStatic)
         {
             return
                 () =>
                 {
-                    gmAtStatic.AddPreParedPlayer(player);
+                    gmAtStatic.AddPreparedPlayer(player);
                     if (!gmAtStatic.AllPlayerPrepared()) return;
                     gmAtStatic.prepareOk = true;
                 };

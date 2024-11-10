@@ -190,15 +190,6 @@ namespace remake
             p1HpDecreaseButton.gameObject.SetActive(nextDebugMode);
         }
 
-        public bool IsDuce()
-        {
-            return round > 3;
-        }
-
-        public void ResetShootCount()
-        {
-            shootCount = 0;
-        }
 
         public bool AllPlayerPrepared()
         {
@@ -210,7 +201,7 @@ namespace remake
             preparedPlayer.Clear();
         }
 
-        public void AddPreParedPlayer(Player player)
+        public void AddPreparedPlayer(Player player)
         {
             preparedPlayer.Add(player);
         }
@@ -218,11 +209,6 @@ namespace remake
         public void SetRoundText(string noOneWinThisRoundPressRToNextRound)
         {
             roundText.text = noOneWinThisRoundPressRToNextRound;
-        }
-
-        public void ResetWinner()
-        {
-            winner = null;
         }
 
         #region flowChange
@@ -248,7 +234,7 @@ namespace remake
 
         public void ToRoundStartState()
         {
-            GameState = new RoundStartState(this, players, roundText, turnText);
+            GameState = new RoundStartState(this, players, roundText, turnText, roundCountText);
         }
 
         public void ToPrepareState()

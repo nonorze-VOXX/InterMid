@@ -26,7 +26,7 @@ namespace remake.GameFlow
 
         public void OnExit()
         {
-            gm.ResetWinner();
+            gm.winner = null;
             endText.enabled = false;
             roundText.text = "";
             foreach (var rPlayer in players) rPlayer.NewRound();

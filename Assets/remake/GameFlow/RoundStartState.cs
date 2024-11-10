@@ -5,25 +5,29 @@ namespace remake.GameFlow
     public class RoundStartState : IGameState
     {
         private readonly GM gm;
+        private readonly TMP_Text roundCountText;
         private readonly TMP_Text turnText;
 
-        public RoundStartState(GM gm, Player[] players, TMP_Text roundText, TMP_Text turnText)
+
+        public RoundStartState(GM gm, Player[] players, TMP_Text roundText, TMP_Text turnText, TMP_Text roundCountText)
         {
             this.gm = gm;
             this.roundText = roundText;
             this.players = players;
             this.turnText = turnText;
+            this.roundCountText = roundCountText;
         }
 
-        public TMP_Text roundText { get; set; }
+        private TMP_Text roundText { get; }
 
-        public Player[] players { get; set; }
+        private Player[] players { get; }
 
 
         public void OnExit()
         {
             // throw new System.NotImplementedException();
             roundText.enabled = false;
+            roundCountText.enabled = true;
             foreach (var rPlayer in players) rPlayer.NewRound();
         }
 
