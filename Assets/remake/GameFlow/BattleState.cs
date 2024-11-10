@@ -7,12 +7,12 @@ namespace remake.GameFlow
     public class BattleState : IGameState
     {
         private readonly GM gm;
-        private readonly rPlayer[] players;
+        private readonly Player[] players;
         private readonly TMP_Text roundText;
 
-        private readonly HashSet<rPlayer> turnEndPlayer = new();
+        private readonly HashSet<Player> turnEndPlayer = new();
 
-        public BattleState(GM gm, rPlayer[] players, TMP_Text roundText)
+        public BattleState(GM gm, Player[] players, TMP_Text roundText)
         {
             this.gm = gm;
             this.players = players;
@@ -39,7 +39,7 @@ namespace remake.GameFlow
             players[1].Turn(OnOneShootEnd(players[1]));
         }
 
-        private UnityAction OnOneShootEnd(rPlayer player)
+        private UnityAction OnOneShootEnd(Player player)
         {
             return () =>
             {
@@ -78,7 +78,7 @@ namespace remake.GameFlow
                     }
                     // next turn
                 }
-                else if (gm.shootCount >= rPlayer.maxDiceCount)
+                else if (gm.shootCount >= Player.maxDiceCount)
                 {
                     // sus
                     gm.ToPrepareState();

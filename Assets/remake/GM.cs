@@ -29,7 +29,7 @@ namespace remake
 
         private static readonly int max_turn = 10;
 
-        [SerializeField] private rPlayer playerPrefab;
+        [SerializeField] private Player playerPrefab;
 
         [SerializeField] private TMP_Text welcomeText;
         [SerializeField] private TMP_Text turnText;
@@ -44,16 +44,16 @@ namespace remake
         [SerializeField] private Button p1HpDecreaseButton;
 
         public int shootCount;
-        public rPlayer winner;
+        public Player winner;
 
-        private readonly HashSet<rPlayer> preparedPlayer = new();
+        private readonly HashSet<Player> preparedPlayer = new();
 
         private IGameState _gameState;
         private int _round;
 
 
         private int _turn;
-        private rPlayer[] players;
+        private Player[] players;
 
         public bool prepareOk { get; set; }
 
@@ -136,7 +136,7 @@ namespace remake
 
             #endregion
 
-            players = new rPlayer[PLAYER_COUNT];
+            players = new Player[PLAYER_COUNT];
             for (var i = 0; i < PLAYER_COUNT; i++) players[i] = Instantiate(playerPrefab);
 
             #region init_player
@@ -210,9 +210,9 @@ namespace remake
             preparedPlayer.Clear();
         }
 
-        public void AddPreParedPlayer(rPlayer rPlayer)
+        public void AddPreParedPlayer(Player player)
         {
-            preparedPlayer.Add(rPlayer);
+            preparedPlayer.Add(player);
         }
 
         public void SetRoundText(string noOneWinThisRoundPressRToNextRound)

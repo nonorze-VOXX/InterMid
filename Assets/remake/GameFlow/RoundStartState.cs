@@ -7,7 +7,7 @@ namespace remake.GameFlow
         private readonly GM gm;
         private readonly TMP_Text turnText;
 
-        public RoundStartState(GM gm, rPlayer[] players, TMP_Text roundText, TMP_Text turnText)
+        public RoundStartState(GM gm, Player[] players, TMP_Text roundText, TMP_Text turnText)
         {
             this.gm = gm;
             this.roundText = roundText;
@@ -17,7 +17,7 @@ namespace remake.GameFlow
 
         public TMP_Text roundText { get; set; }
 
-        public rPlayer[] players { get; set; }
+        public Player[] players { get; set; }
 
 
         public void OnExit()

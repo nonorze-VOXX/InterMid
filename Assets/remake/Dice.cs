@@ -12,13 +12,13 @@ namespace remake
         Triple
     }
 
-    public class rDice : MonoBehaviour
+    public class Dice : MonoBehaviour
     {
         public float diceSpeed = 5;
         private DiceType _diceType;
         private TMP_Text _text;
         private int _value;
-        private UnityAction<rPlayer, rDice> diceSkills;
+        private UnityAction<Player, Dice> diceSkills;
         private bool moveable;
         private UnityAction OnDicePrepared;
         private Vector2 pos = new(0, 0);
@@ -131,7 +131,7 @@ namespace remake
             return _diceType;
         }
 
-        public void Add(rDice dice)
+        public void Add(Dice dice)
         {
             value += dice.GetValue();
         }
@@ -141,7 +141,7 @@ namespace remake
             this.value = value;
         }
 
-        public void MergeTo(rDice dice, UnityAction action)
+        public void MergeTo(Dice dice, UnityAction action)
         {
             Shoot(dice.transform.position, DiceMoveSpeed.Normal, () =>
             {
@@ -163,12 +163,12 @@ namespace remake
                 Debug.LogError("Invalid color code.");
         }
 
-        public void AddFunction(UnityAction<rPlayer, rDice> skillItem2)
+        public void AddFunction(UnityAction<Player, Dice> skillItem2)
         {
             diceSkills += skillItem2;
         }
 
-        public void UseSkill(rPlayer player)
+        public void UseSkill(Player player)
         {
             diceSkills?.Invoke(player, this);
         }

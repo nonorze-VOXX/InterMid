@@ -6,14 +6,14 @@ namespace remake.GameFlow
     {
         private readonly TMP_Text endText;
         private readonly GM gm;
-        private readonly rPlayer[] players;
+        private readonly Player[] players;
         private readonly TMP_Text roundCountText;
         private readonly TMP_Text roundText;
 
         private readonly TMP_Text turnText;
 
 
-        public EndState(GM gm, rPlayer[] players, TMP_Text endText, TMP_Text turnText, TMP_Text roundText,
+        public EndState(GM gm, Player[] players, TMP_Text endText, TMP_Text turnText, TMP_Text roundText,
             TMP_Text roundCountText)
         {
             this.gm = gm;

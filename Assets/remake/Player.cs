@@ -28,7 +28,7 @@ namespace remake
         Die
     }
 
-    public class rPlayer : MonoBehaviour
+    public class Player : MonoBehaviour
     {
         private static readonly float DiceDistance = 1.5f;
         private static readonly int fullHp = 100;
@@ -37,12 +37,12 @@ namespace remake
 
         [SerializeField] private TMP_Text statusText;
 
-        private readonly List<rDice> dices = new();
+        private readonly List<Dice> dices = new();
 
         private Slider hpSlider;
 
         private bool isAttacking;
-        private rPlayer opponent;
+        private Player opponent;
         private SpriteRenderer spriteRenderer;
 
         private void Awake()
@@ -74,12 +74,12 @@ namespace remake
             isAttacking = b;
         }
 
-        public void SetOpponent(rPlayer p)
+        public void SetOpponent(Player p)
         {
             opponent = p;
         }
 
-        public rDice GetDice()
+        public Dice GetDice()
         {
             if (dices.Count == 0) return null;
             return dices[0];
@@ -357,14 +357,14 @@ namespace remake
         public const int maxDiceCount = 3;
         private int throwCount;
 
-        [SerializeField] private rDice dicePrefab;
+        [SerializeField] private Dice dicePrefab;
 
         public void ResetThrowCount()
         {
             throwCount = 0;
         }
 
-        private void CheckDiceIsTriple(List<rDice> dices, UnityAction onPrepared)
+        private void CheckDiceIsTriple(List<Dice> dices, UnityAction onPrepared)
         {
             if (dices.Count != 3) return;
             // check all value is same
@@ -413,7 +413,7 @@ namespace remake
             };
         }
 
-        private void CheckDiceIsPair(List<rDice> dices, UnityAction onPrepared)
+        private void CheckDiceIsPair(List<Dice> dices, UnityAction onPrepared)
         {
             // onPrepared?.Invoke();
             // return;

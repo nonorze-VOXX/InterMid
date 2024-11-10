@@ -71,7 +71,7 @@ namespace remake
             }
         }
 
-        private static UnityAction<rPlayer, rDice> GetAtkFun(string value, rDice dice)
+        private static UnityAction<Player, Dice> GetAtkFun(string value, Dice dice)
         {
             #region TrueDamage
 
@@ -112,7 +112,7 @@ namespace remake
                 };
         }
 
-        private static UnityAction<rPlayer, rDice> GetDefFun(string value)
+        private static UnityAction<Player, Dice> GetDefFun(string value)
         {
             return
                 (player, dice) =>
@@ -157,17 +157,17 @@ namespace remake
             };
         }
 
-        public static void SetDiceFunc(rDice dice, rPlayer rPlayer)
+        public static void SetDiceFunc(Dice dice, Player player)
         {
             var type = dice.GetDiceType();
-            var isAtk = rPlayer.IsAtkState();
+            var isAtk = player.IsAtkState();
             if (isAtk)
-                SetAtkFunc(dice, rPlayer, type);
+                SetAtkFunc(dice, player, type);
             else
-                SetDefFunc(dice, rPlayer, type);
+                SetDefFunc(dice, player, type);
         }
 
-        private static void SetDefFunc(rDice dice, rPlayer player, DiceType type)
+        private static void SetDefFunc(Dice dice, Player player, DiceType type)
         {
             foreach (var skill in defSkills)
                 if (skill.Item1 == type)
@@ -178,12 +178,12 @@ namespace remake
                 }
         }
 
-        private static UnityAction<rPlayer, rDice> GetDefSkill(string skillItem2, rDice dice, rPlayer player)
+        private static UnityAction<Player, Dice> GetDefSkill(string skillItem2, Dice dice, Player player)
         {
             return GetDefFun(skillItem2);
         }
 
-        private static void SetAtkFunc(rDice dice, rPlayer player, DiceType type)
+        private static void SetAtkFunc(Dice dice, Player player, DiceType type)
         {
             foreach (var skill in atkSkills)
                 if (skill.Item1 == type)
@@ -193,7 +193,7 @@ namespace remake
                 }
         }
 
-        private static UnityAction<rPlayer, rDice> GetAtkSkill(string skillItem2, rDice dice, rPlayer player)
+        private static UnityAction<Player, Dice> GetAtkSkill(string skillItem2, Dice dice, Player player)
         {
             return GetAtkFun(skillItem2, dice);
         }

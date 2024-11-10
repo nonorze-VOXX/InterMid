@@ -8,11 +8,11 @@ namespace remake.GameFlow
         private static readonly int max_turn = 10;
         private readonly GM gm;
 
-        private readonly rPlayer[] players;
+        private readonly Player[] players;
 
         private readonly TMP_Text turnText;
 
-        public PrepareState(GM gm, rPlayer[] players, TMP_Text turnText)
+        public PrepareState(GM gm, Player[] players, TMP_Text turnText)
         {
             this.gm = gm;
             this.players = players;
@@ -63,12 +63,12 @@ namespace remake.GameFlow
             }
         }
 
-        private static UnityAction OnPrepareDone(rPlayer rPlayer, GM gmAtStatic)
+        private static UnityAction OnPrepareDone(Player player, GM gmAtStatic)
         {
             return
                 () =>
                 {
-                    gmAtStatic.AddPreParedPlayer(rPlayer);
+                    gmAtStatic.AddPreParedPlayer(player);
                     if (!gmAtStatic.AllPlayerPrepared()) return;
                     gmAtStatic.prepareOk = true;
                 };
